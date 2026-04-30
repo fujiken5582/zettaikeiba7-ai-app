@@ -81,7 +81,7 @@ function generateXPost(date, races, showdownRaces) {
     text += `🔥 激熱 ${showdownRaces.length}R\n`;
   }
   text += `\n📋詳細→ ${process.env.PAGES_URL || 'https://fujiken5582.github.io/zettai-atarukun/'}\n`;
-  text += `#競馬予想 #AI予想 #ホライゾン`;
+  text += `#競馬予想 #競馬AI #ホライゾン #JRA`;
 
   return text;
 }
@@ -98,7 +98,7 @@ function generateXPostsSplit(date, races) {
     if (r.top3Name) text += `▲ ${r.top3Name}（${r.top3Jockey}） ${r.top3Score}\n`;
     text += `\n`;
     text += `競馬予想AI ホライゾン\n`;
-    text += `#競馬予想 #${r.venue}競馬 #ホライゾン`;
+    text += `#競馬予想 #競馬AI #${r.venue}競馬 #ホライゾン`;
     return text;
   });
 }
@@ -142,7 +142,7 @@ function generateNoteMarkdown(date, races, showdownRaces, venue) {
   md += `- モデル: HistGradientBoostingClassifier\n`;
   md += `- 1着的中率: 28.65% / 3着内的中率: 49.21%\n\n`;
   md += `※ 予想は当たることを保証するものではありません。馬券購入は自己責任でお願いします。\n\n`;
-  md += `#競馬予想 #AI予想 #ホライゾン\n`;
+  md += `#競馬予想 #AI予想 #ホライゾン #JRA\n`;
 
   return md;
 }
