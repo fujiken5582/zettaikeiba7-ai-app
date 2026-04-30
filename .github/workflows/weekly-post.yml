@@ -2,20 +2,22 @@ name: Weekly Race Prediction Post
 
 on:
   schedule:
-    # 毎日朝9:00 JST = UTC 0:00 (本日のレース)
-    - cron: '0 0 * * *'
-    # 金曜日のみ朝8:00 JST = UTC 23:00 (木曜UTC) (明日=土曜の速報)
-    - cron: '0 23 * * 4'
+    # 土日朝9:00 JST = UTC 0:00 (当日の予測)
+    - cron: '0 0 * * 6,0'
+    # 木曜・金曜の朝7:00 JST = UTC 22:00 (前日UTC) → 今週末（土日）の速報
+    # 水曜UTC 22:00 = 木曜JST 07:00、木曜UTC 22:00 = 金曜JST 07:00
+    - cron: '0 22 * * 3,4'
   workflow_dispatch:
     inputs:
       target_day:
-        description: '対象日 (today=本日 / tomorrow=明日の速報)'
+        description: '対象日'
         required: false
         default: 'today'
         type: choice
         options:
           - today
           - tomorrow
+          - weekend
 
 permissions:
   contents: write
@@ -37,10 +39,11 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "target_day=${{ github.event.inputs.target_day }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 23 * * 4" ]; then
-            # 金曜朝の速報実行
-            echo "target_day=tomorrow" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 22 * * 3,4" ]; then
+            # 木曜・金曜朝の今週末速報
+            echo "target_day=weekend" >> $GITHUB_OUTPUT
           else
+            # 土日朝の当日予測
             echo "target_day=today" >> $GITHUB_OUTPUT
           fi
 
