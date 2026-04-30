@@ -309,7 +309,7 @@ async function main() {
     if (DISCORD_WEBHOOK) {
       await fetch(DISCORD_WEBHOOK, {
         method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のJRAレースはありません` })
+        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のレースなし。Discord通知してスキップ' })
       });
     }
     return;
