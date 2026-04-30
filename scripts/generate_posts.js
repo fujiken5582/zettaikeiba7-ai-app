@@ -298,28 +298,39 @@ async function main() {
   });
   console.log('サンプル:', JSON.stringify(flattenedRaces[0]));
 
+  // JRAも地方も両方対象（旧: JRAのみ）
   const todayRaces = flattenedRaces.filter(r => {
-    const isJRA = r.raceId && /^\d{12}$/.test(r.raceId) && parseInt(r.raceId.substring(4,6)) < 30;
-    return isJRA && r.dateDisplay === dateMatch;
+    return r.raceId && r.dateDisplay === dateMatch;
   });
-  console.log(`✅ 本日のJRA: ${todayRaces.length}レース`);
+  const jraCount = todayRaces.filter(r => r.raceId && parseInt(r.raceId.substring(4,6)) < 30).length;
+  const narCount = todayRaces.length - jraCount;
+  console.log(`JRA: ${jraCount}件 / 地方: ${narCount}件`);
+  console.log(`✅ 本日のレース: ${todayRaces.length}件 (JRA+地方)`);
 
   if (todayRaces.length === 0) {
     console.log('⚠️ 本日開催のJRAレースなし。Discord通知してスキップ');
     if (DISCORD_WEBHOOK) {
       await fetch(DISCORD_WEBHOOK, {
         method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のレースなし。Discord通知してスキップ' })
+        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のレースはありません` })
       });
     }
     return;
   }
 
-  // 3. 各レースを予測
+  // 3. 各レースを予測（最大数を制限：1日200レース上限）
+  const MAX_PREDICTIONS = 200;
+  const targetRaces = todayRaces.slice(0, MAX_PREDICTIONS);
+  if (todayRaces.length > MAX_PREDICTIONS) {
+    console.log(`⚠️ ${todayRaces.length}件中 上限${MAX_PREDICTIONS}件まで予測`);
+  }
+  
   const results = [];
-  for (let i = 0; i < todayRaces.length; i++) {
-    const race = todayRaces[i];
-    process.stdout.write(`予測中 ${i+1}/${todayRaces.length}: ${race.venue}${race.raceNum}R...`);
+  for (let i = 0; i < targetRaces.length; i++) {
+    const race = targetRaces[i];
+    const isJRA = parseInt(race.raceId.substring(4,6)) < 30;
+    const tag = isJRA ? '[JRA]' : '[地方]';
+    process.stdout.write(`予測中 ${i+1}/${targetRaces.length}: ${tag} ${race.venue}${race.raceNum}R...`);
     try {
       const fetchData = await fetchPost(`${APP_URL}/api/fetch-race`, { url: race.url || `https://race.netkeiba.com/race/shutuba_past.html?race_id=${race.raceId}` });
       if (!fetchData.success || !fetchData.data || !fetchData.data.horses) { console.log(' SKIP'); continue; }
@@ -334,6 +345,7 @@ async function main() {
         venue: race.venue,
         raceNum: race.raceNum,
         raceName: race.raceName || '',
+        isJRA: isJRA,
         top1Name: top1.horseName,
         top1Jockey: (top1.details && top1.details.jockey) || '',
         top1Score: score1.toFixed(1),
@@ -342,7 +354,7 @@ async function main() {
       });
       console.log(' ✅');
     } catch(e) {
-      console.log(` ❌ ${e.message}`);
+      console.log(` ❌ ${e.message.substring(0,50)}`);
     }
   }
 
