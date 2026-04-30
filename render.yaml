@@ -1,0 +1,21 @@
+# Render Blueprint - https://render.com/docs/blueprint-spec
+# このファイルをリポジトリ直下に置くと Render の "Blueprint" 機能で自動デプロイ可能
+
+services:
+  - type: web
+    name: keiba-ai
+    env: node
+    plan: free
+    region: singapore  # 日本に最も近いリージョン
+    buildCommand: |
+      npm install --omit=dev
+      pip install --user -r requirements.txt
+    startCommand: node race-id-prediction-app.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PYTHON_CMD
+        value: python3

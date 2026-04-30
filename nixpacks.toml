@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.pip"]
+
+[phases.install]
+cmds = [
+  "pip install numpy==2.4.3 scikit-learn==1.8.0 --no-cache-dir",
+  "npm install",
+  "python3 --version",
+  "python3 -c 'import sklearn; print(sklearn.__version__)'",
+  "python3 -c 'import pickle; d=pickle.load(open("model_v2.pkl","rb")); print("model OK features:",len(d["features"]))'"]
+
+[start]
+cmd = "node race-id-prediction-app.js"
