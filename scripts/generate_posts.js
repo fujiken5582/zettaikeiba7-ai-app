@@ -274,7 +274,8 @@ async function main() {
   console.log('📋 レース一覧を取得中...');
   const raceList = await fetchJson(`${APP_URL}/api/race-list`);
   if (!raceList.success) throw new Error('レース一覧取得失敗');
-  console.log(`✅ ${raceList.races.length}レース取得`);
+  const allRaces = raceList.data || raceList.races || [];
+  console.log(`✅ ${allRaces.length}レース取得`);
 
   // 2. 今日の日付（曜日問わず）= 取得対象
   const today = new Date();
@@ -282,7 +283,22 @@ async function main() {
   console.log(`本日の日付: ${dateMatch}`);
 
   // 今日開催のJRAレースのみフィルタ
-  const todayRaces = raceList.races.filter(r => {
+  // raceDataから情報を展開
+  const flattenedRaces = allRaces.map(r => {
+    const rd = r.raceData || {};
+    return {
+      raceId: r.raceId,
+      raceName: r.raceName || rd.raceName || '',
+      date: r.date,
+      dateDisplay: r.dateDisplay,
+      venue: r.venue || rd.venue || '',
+      raceNum: rd.raceNum || rd.number || '',
+      url: r.url
+    };
+  });
+  console.log('サンプル:', JSON.stringify(flattenedRaces[0]));
+
+  const todayRaces = flattenedRaces.filter(r => {
     const isJRA = r.raceId && /^\d{12}$/.test(r.raceId) && parseInt(r.raceId.substring(4,6)) < 30;
     return isJRA && r.dateDisplay === dateMatch;
   });
