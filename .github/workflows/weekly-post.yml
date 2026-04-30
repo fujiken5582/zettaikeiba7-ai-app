@@ -1,0 +1,40 @@
+name: Weekly Race Prediction Post
+
+on:
+  schedule:
+    - cron: '30 0 * * 6,0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate posts
+        env:
+          APP_URL: https://zettaikeiba7-ai-app-1.onrender.com
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: node scripts/generate_posts.js
+
+      - name: Commit and push results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --staged --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "🤖 自動投稿生成: $(date '+%Y-%m-%d')"
+            git push
+          fi
