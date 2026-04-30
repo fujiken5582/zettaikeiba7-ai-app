@@ -1,31 +1,6 @@
-{
-  "name": "keiba-ai-js",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "AI競馬予測システム - 機械学習による高精度レース予測",
-  "scripts": {
-    "start": "node race-id-prediction-app.js",
-    "scrape": "node src/scraper/runScraper.js",
-    "dev": "node src/server.js",
-    "web:dev": "cd web && npm run dev"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
-    "axios": "^1.6.2",
-    "canvas": "^3.2.0",
-    "cheerio": "^1.0.0-rc.12",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "iconv-lite": "^0.7.0",
-    "multer": "^2.0.2",
-    "pdf2json": "^4.0.0",
-    "pdfjs-dist": "^3.11.174"
-  },
-  "devDependencies": {
-    "@types/node": "^20.10.0"
-  }
-}
+node_modules/
+.env
+*.log
+.DS_Store
+__pycache__/
+*.pyc

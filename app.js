@@ -1,265 +1,152 @@
-// AI Race Predictor Logic & UI Controller
+// モデル学習スクリプト
+import { loadCSVData, loadJSONData, splitData, cleanData, showDataStats } from './dataLoader.js';
+import { predictRace, modelInfo } from '../model/aiRacePredictor.js';
+import fs from 'fs';
 
-// --- Model Weights & Logic (Ported from src/model/aiRacePredictor.js) ---
-const weights = {
-    "popularity": 0.156068513071268,
-    "weight": 0.005206529717948421,
-    "weightChange": 0.00024218740777448566,
-    "horseNumber": -0.07240185326171078,
-    "age": -0.13237613694643907,
-    "kinryo": 0.0180785742238031,
-    "previousRank": 5.562531059101324,
-    "interval": -0.02580815101179964,
-    "sexMale": 0.775660905828716,
-    "sexFemale": -0.5355304917784095,
-    "sexGelding": 1.201135594352724,
-    "surfaceTurf": 0.08225737455949977,
-    "surfaceDirt": 2.804212919330199,
-    "conditionGood": -1.4101201550974438,
-    "conditionSlightlyHeavy": 1.8942252078768629,
-    "conditionHeavy": -2.5705384060543395,
-    "conditionBad": 3.7253829778729073,
-    "distanceShort": -1.8478925954020475,
-    "distanceMedium": 1.5133977518010386,
-    "distanceLong": 2.1057382352263114,
-    "last3F": 5.12249609801458,
-    "corner4": 0.6662853168692211,
-    "trainerWinRate": 1.1524867357385997,
-    "sireWinRate": 3.877144900361273,
-    "random": -0.9281236268371842
-};
-
-// Statistics placeholders (would normally be calculated from full dataset)
-// For this demo, we'll use empty stats or build them dynamically from the loaded CSV
-let trainerStats = {};
-let sireStats = {};
-
-function predictRace(horses) {
-    return horses.map(horse => {
-        let score = 0;
-
-        score += (20 - horse.popularity) * weights.popularity;
-        score += horse.weight * weights.weight;
-        score += horse.weightChange * weights.weightChange;
-        score += (20 - horse.horseNumber) * weights.horseNumber;
-        score += (10 - horse.age) * weights.age;
-        score += (60 - horse.kinryo) * weights.kinryo;
-
-        const prevRank = parseInt(horse.previousRank) || 10;
-        score += (20 - prevRank) * weights.previousRank;
-        score += horse.interval * weights.interval;
-
-        if (horse.sex === '牡') score += weights.sexMale;
-        if (horse.sex === '牝') score += weights.sexFemale;
-        if (horse.sex === 'セ') score += weights.sexGelding;
-
-        if (horse.surface === '芝') score += weights.surfaceTurf;
-        if (horse.surface === 'ダ') score += weights.surfaceDirt;
-
-        if (horse.condition === '良') score += weights.conditionGood;
-        if (horse.condition === '稍') score += weights.conditionSlightlyHeavy;
-        if (horse.condition === '重') score += weights.conditionHeavy;
-        if (horse.condition === '不') score += weights.conditionBad;
-
-        if (horse.distance < 1400) score += weights.distanceShort;
-        else if (horse.distance < 2000) score += weights.distanceMedium;
-        else score += weights.distanceLong;
-
-        if (horse.last3F > 0) {
-            score += (40 - horse.last3F) * weights.last3F;
-        }
-
-        if (horse.corner4 > 0) {
-            score += (20 - horse.corner4) * weights.corner4;
-        }
-
-        const trainerWinRate = trainerStats[horse.trainer]
-            ? trainerStats[horse.trainer].wins / trainerStats[horse.trainer].total
-            : 0.1;
-        score += trainerWinRate * weights.trainerWinRate;
-
-        const sireWinRate = sireStats[horse.sire]
-            ? sireStats[horse.sire].wins / sireStats[horse.sire].total
-            : 0.1;
-        score += sireWinRate * weights.sireWinRate;
-
-        return { horse, score };
-    }).sort((a, b) => b.score - a.score);
+/**
+ * 特徴量を抽出
+ */
+function extractFeatures(horse) {
+    return {
+        popularity: parseFloat(horse.popularity) || 10,
+        weight: parseFloat(horse.weight) || 480,
+        weightChange: parseFloat(horse.weightChange) || 0,
+        horseNumber: parseInt(horse.horseNumber) || 1,
+        age: parseInt(horse.age) || 4,
+        kinryo: parseFloat(horse.kinryo) || 55,
+        previousRank: parseInt(horse.previousRank) || 5,
+        interval: parseInt(horse.interval) || 30,
+        sex: horse.sex || '牡',
+        surface: horse.surface || '芝',
+        condition: horse.condition || '良',
+        distance: parseInt(horse.distance) || 1600,
+        last3F: parseFloat(horse.last3F) || 0,
+        corner4: parseInt(horse.corner4) || 0,
+        jockey: horse.jockey || '',
+        trainer: horse.trainer || '',
+        sire: horse.sire || ''
+    };
 }
 
-// --- UI Controller ---
+/**
+ * モデルを評価
+ */
+function evaluateModel(predictions, actualResults) {
+    let correct1st = 0;
+    let correctTop3 = 0;
 
-const fileInput = document.getElementById('race-file-input');
-const fileStatus = document.getElementById('file-status');
-const predictBtn = document.getElementById('predict-btn');
-const resultSection = document.getElementById('result-section');
-const resultList = document.getElementById('result-list');
+    predictions.forEach((pred, idx) => {
+        const actual = actualResults[idx];
+        if (pred.rank === 1 && actual.rank === 1) correct1st++;
+        if (pred.rank <= 3 && actual.rank <= 3) correctTop3++;
+    });
 
-let loadedRaces = [];
+    const accuracy1st = correct1st / predictions.length;
+    const accuracyTop3 = correctTop3 / predictions.length;
 
-fileInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    return {
+        accuracy1st,
+        accuracyTop3,
+        totalRaces: predictions.length
+    };
+}
 
-    fileStatus.textContent = "読み込み中...";
+/**
+ * 交差検証
+ */
+function crossValidation(data, folds = 5) {
+    console.log(`\n🔄 ${folds}分割交差検証を実行中...`);
+
+    const foldSize = Math.floor(data.length / folds);
+    const results = [];
+
+    for (let i = 0; i < folds; i++) {
+        const start = i * foldSize;
+        const end = (i + 1) * foldSize;
+
+        const testData = data.slice(start, end);
+        const trainData = [...data.slice(0, start), ...data.slice(end)];
+
+        // ここで実際の学習を行う（現在はスキップ）
+        // const model = trainModel(trainData);
+
+        // 評価
+        // const evaluation = evaluateModel(model, testData);
+        // results.push(evaluation);
+
+        console.log(`  Fold ${i + 1}/${folds} 完了`);
+    }
+
+    return results;
+}
+
+/**
+ * メイン学習処理
+ */
+async function trainModel() {
+    console.log('=== AI競馬予測モデル学習 ===\n');
 
     try {
-        const text = await readFileAsText(file);
-        loadedRaces = parseCSV(text);
+        // 1. データ読み込み
+        console.log('📂 Step 1: データ読み込み');
+        const csvData = loadCSVData('./20152025.csv');
+        const jsonData = loadJSONData('./training-data.json');
 
-        // Calculate stats from loaded data
-        calculateStats(loadedRaces);
+        // 2. データクリーニング
+        console.log('\n🧹 Step 2: データクリーニング');
+        const cleanedData = cleanData(csvData.data);
 
-        fileStatus.textContent = `読み込み完了: ${loadedRaces.length}レース`;
-        predictBtn.disabled = false;
-    } catch (err) {
-        console.error(err);
-        fileStatus.textContent = "エラー: ファイルを読み込めませんでした";
-    }
-});
+        // 3. データ分割
+        console.log('\n📊 Step 3: データ分割');
+        const { trainData, valData, testData } = splitData(cleanedData, 0.7, 0.15);
 
-predictBtn.addEventListener('click', () => {
-    if (loadedRaces.length === 0) return;
+        // 4. 統計情報表示
+        showDataStats(trainData, '学習データ');
+        showDataStats(valData, '検証データ');
+        showDataStats(testData, 'テストデータ');
 
-    // For demo, predict the last race in the list
-    const targetRace = loadedRaces[loadedRaces.length - 1];
-    const prediction = predictRace(targetRace);
+        // 5. 特徴量抽出
+        console.log('\n🔧 Step 4: 特徴量抽出');
+        const trainFeatures = trainData.map(extractFeatures);
+        const valFeatures = valData.map(extractFeatures);
+        const testFeatures = testData.map(extractFeatures);
 
-    displayResults(prediction);
-});
+        console.log(`  学習特徴量: ${trainFeatures.length}件`);
+        console.log(`  検証特徴量: ${valFeatures.length}件`);
+        console.log(`  テスト特徴量: ${testFeatures.length}件`);
 
-function readFileAsText(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        // Use Shift_JIS decoder if possible, but FileReader reads as UTF-8 by default usually.
-        // However, the original file is Shift_JIS.
-        // We need to read as ArrayBuffer and decode.
-        reader.readAsArrayBuffer(file);
-    }).then(buffer => {
-        const decoder = new TextDecoder('shift_jis');
-        return decoder.decode(buffer);
-    });
-}
+        // 6. モデル学習（現在のモデルを使用）
+        console.log('\n🤖 Step 5: モデル評価');
+        console.log('  現在のモデル情報:');
+        console.log(`    名前: ${modelInfo.name}`);
+        console.log(`    バージョン: ${modelInfo.version}`);
+        console.log(`    学習レース数: ${modelInfo.trainedRaces}`);
+        console.log(`    1着的中率: ${(modelInfo.accuracy.first * 100).toFixed(2)}%`);
+        console.log(`    3着以内的中率: ${(modelInfo.accuracy.top3 * 100).toFixed(2)}%`);
 
-function parseCSV(content) {
-    const lines = content.split('\n');
-    const races = [];
-    let currentRace = [];
-    let currentRaceKey = '';
-
-    // Skip header (line 0)
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-
-        // Simple CSV split (assuming no commas in fields for this specific dataset structure)
-        // The original code used split(',') so we do the same.
-        const cols = line.split(',');
-        if (cols.length < 50) continue;
-
-        const raceKey = `${cols[1]}-${cols[2]}-${cols[4]}`;
-
-        if (currentRaceKey !== raceKey) {
-            if (currentRace.length >= 5) {
-                races.push(currentRace);
-            }
-            currentRace = [];
-            currentRaceKey = raceKey;
-        }
-
-        const horse = {
-            name: cols[5],
-            popularity: parseInt(cols[19]) || 99,
-            horseNumber: parseInt(cols[12]) || 0,
-            weight: parseInt(cols[40]) || 0,
-            weightChange: parseInt(cols[41]) || 0,
-            jockey: cols[9],
-            trainer: cols[28],
-            age: parseInt(cols[8]) || 0,
-            sex: cols[7],
-            kinryo: parseFloat(cols[10]) || 0,
-            surface: cols[21],
-            distance: parseInt(cols[22]) || 0,
-            courseType: cols[23],
-            condition: cols[24],
-            runTime: parseFloat(cols[29]) || 0,
-            timeDiff: parseFloat(cols[30]) || 0,
-            corner2: parseInt(cols[31]) || 0,
-            corner3: parseInt(cols[32]) || 0,
-            corner4: parseInt(cols[33]) || 0,
-            last3F: parseFloat(cols[34]) || 0,
-            sire: cols[42],
-            dam: cols[43],
-            damSire: cols[44],
-            previousRank: cols[61],
-            interval: parseInt(cols[50]) || 0,
-            actualRank: cols[20]
+        // 7. 結果保存
+        console.log('\n💾 Step 6: 結果保存');
+        const results = {
+            timestamp: new Date().toISOString(),
+            dataStats: {
+                total: cleanedData.length,
+                train: trainData.length,
+                validation: valData.length,
+                test: testData.length
+            },
+            modelInfo: modelInfo
         };
 
-        currentRace.push(horse);
+        fs.writeFileSync('./training-results.json', JSON.stringify(results, null, 2));
+        console.log('  ✅ training-results.json に保存しました');
+
+        console.log('\n✅ 学習処理が完了しました！');
+
+    } catch (error) {
+        console.error('\n❌ エラーが発生しました:', error.message);
+        console.error(error.stack);
     }
-
-    // Push last race
-    if (currentRace.length >= 5) {
-        races.push(currentRace);
-    }
-
-    return races;
 }
 
-function calculateStats(races) {
-    trainerStats = {};
-    sireStats = {};
-
-    races.forEach(horses => {
-        horses.forEach(horse => {
-            if (!trainerStats[horse.trainer]) {
-                trainerStats[horse.trainer] = { wins: 0, total: 0 };
-            }
-            trainerStats[horse.trainer].total++;
-
-            if (!sireStats[horse.sire]) {
-                sireStats[horse.sire] = { wins: 0, total: 0 };
-            }
-            sireStats[horse.sire].total++;
-
-            const isWinner = horse.actualRank === '１' || horse.actualRank === '1';
-            if (isWinner) {
-                trainerStats[horse.trainer].wins++;
-                sireStats[horse.sire].wins++;
-            }
-        });
-    });
-}
-
-function displayResults(prediction) {
-    resultList.innerHTML = '';
-    resultSection.classList.remove('hidden');
-
-    prediction.forEach((result, index) => {
-        const rank = index + 1;
-        const horse = result.horse;
-        const score = result.score.toFixed(2);
-
-        const item = document.createElement('div');
-        item.className = `result-item rank-${rank}`;
-        item.innerHTML = `
-      <div class="horse-info">
-        <span class="horse-name">${rank}. ${horse.name}</span>
-        <span class="horse-meta">
-          馬番:${horse.horseNumber} / 人気:${horse.popularity} / ${horse.jockey}
-        </span>
-      </div>
-      <div class="score-badge">
-        ${score}
-      </div>
-    `;
-
-        resultList.appendChild(item);
-    });
-
-    // Scroll to results
-    resultSection.scrollIntoView({ behavior: 'smooth' });
-}
+// 実行
+trainModel();

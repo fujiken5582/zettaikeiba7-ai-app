@@ -1,21 +1,19 @@
-{
-    "name": "AI競馬予測",
-    "short_name": "AI競馬",
-    "start_url": "./index.html",
-    "display": "standalone",
-    "background_color": "#121212",
-    "theme_color": "#1a1a1a",
-    "description": "AIによる高精度な競馬予測アプリケーション",
-    "icons": [
-        {
-            "src": "icons/icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/icon-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+export const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+export async function insertData(table, data) {
+  const { error } = await supabase.from(table).insert(data);
+  if (error) console.error(error);
+}
+
+export async function upsertData(table, data) {
+  const { error } = await supabase.from(table).upsert(data);
+  if (error) console.error(error);
 }
