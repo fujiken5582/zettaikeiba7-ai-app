@@ -298,21 +298,21 @@ async function main() {
   });
   console.log('サンプル:', JSON.stringify(flattenedRaces[0]));
 
-  // JRAも地方も両方対象（旧: JRAのみ）
+  // JRAレースのみ対象
   const todayRaces = flattenedRaces.filter(r => {
-    return r.raceId && r.dateDisplay === dateMatch;
+    if (!r.raceId || r.dateDisplay !== dateMatch) return false;
+    // 場所コード（5-6桁目）が30未満ならJRA
+    const placeCode = parseInt(r.raceId.substring(4, 6));
+    return placeCode < 30;
   });
-  const jraCount = todayRaces.filter(r => r.raceId && parseInt(r.raceId.substring(4,6)) < 30).length;
-  const narCount = todayRaces.length - jraCount;
-  console.log(`JRA: ${jraCount}件 / 地方: ${narCount}件`);
-  console.log(`✅ 本日のレース: ${todayRaces.length}件 (JRA+地方)`);
+  console.log(`✅ 本日のJRAレース: ${todayRaces.length}件`);
 
   if (todayRaces.length === 0) {
     console.log('⚠️ 本日開催のJRAレースなし。Discord通知してスキップ');
     if (DISCORD_WEBHOOK) {
       await fetch(DISCORD_WEBHOOK, {
         method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のレースはありません` })
+        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のJRAレースはありません` })
       });
     }
     return;
