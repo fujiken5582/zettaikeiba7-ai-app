@@ -80,8 +80,7 @@ function generateXPost(date, races, showdownRaces) {
   if (showdownRaces.length > 0) {
     text += `🔥 激熱 ${showdownRaces.length}R\n`;
   }
-  text += `\n📋詳細→ ${process.env.PAGES_URL || 'https://fujiken5582.github.io/zettai-atarukun/'}\n`;
-  text += `#競馬予想 #競馬AI #ホライゾン #JRA`;
+  text += `\n#競馬予想 #競馬AI #ホライゾン #JRA`;
 
   return text;
 }
@@ -159,7 +158,7 @@ function generateBlueskyPost(date, races, showdownRaces) {
       if (r.top3Name) text += `▲${r.top3Name} ${r.top3Score}\n`;
     });
   }
-  text += `\n全予測→ ${process.env.PAGES_URL || 'https://fujiken5582.github.io/zettai-atarukun/'}`;
+  text += `\n#競馬予想 #競馬AI #ホライゾン`;
   return text;
 }
 
