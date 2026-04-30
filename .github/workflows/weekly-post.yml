@@ -2,8 +2,8 @@ name: Weekly Race Prediction Post
 
 on:
   schedule:
-    # 土日朝9:00 JST = UTC 0:00 (当日の予測)
-    - cron: '0 0 * * 6,0'
+    # 土日朝8:00 JST = UTC 23:00 前日 (当日の予測)
+    - cron: '0 23 * * 5,6'
     # 木曜・金曜の朝7:00 JST = UTC 22:00 (前日UTC) → 今週末（土日）の速報
     # 水曜UTC 22:00 = 木曜JST 07:00、木曜UTC 22:00 = 金曜JST 07:00
     - cron: '0 22 * * 3,4'
