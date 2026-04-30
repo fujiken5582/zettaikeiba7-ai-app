@@ -32,15 +32,17 @@ async function fetchPost(url, body) {
 }
 
 // 日付フォーマット
-function todayStr() {
+function todayStr(offsetDays = 0) {
   const d = new Date();
+  if (offsetDays !== 0) d.setDate(d.getDate() + offsetDays);
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 }
 
 // 投稿テキスト生成（X用） - Top3印付き
 function generateXPost(date, races, showdownRaces) {
   const venues = [...new Set(races.map(r => r.venue))].join('・');
-  let text = `🐎 ${date} ${venues} AI予測\n`;
+  const previewMark = process.env.TARGET_DAY === 'tomorrow' ? '【⚡明日の速報⚡】' : '';
+  let text = `🐎 ${previewMark}${date} ${venues} AI予測\n`;
   text += `📊 競馬予想AI ホライゾン\n`;
   text += `━━━━━━━━━━━━━━\n\n`;
 
@@ -144,8 +146,9 @@ function generateBlueskyPost(date, races, showdownRaces) {
 async function notifyDiscord(date, races, showdownRaces) {
   if (!DISCORD_WEBHOOK) return;
 
+  const previewMark = process.env.TARGET_DAY === 'tomorrow' ? '⚡【明日の速報】' : '';
   const embed = {
-    title: `📩 ${date} AI予測 準備完了`,
+    title: `📩 ${previewMark}${date} AI予測 準備完了`,
     description: `今週は **${races.length}レース** の予測が完了しました。`,
     color: 0xf0c040,
     fields: [
@@ -325,10 +328,13 @@ async function main() {
   const allRaces = raceList.data || raceList.races || [];
   console.log(`✅ ${allRaces.length}レース取得`);
 
-  // 2. 今日の日付（曜日問わず）= 取得対象
-  const today = new Date();
-  const dateMatch = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
-  console.log(`本日の日付: ${dateMatch}`);
+  // 2. 対象日を決定（環境変数 TARGET_DAY: 'today' or 'tomorrow'）
+  const targetDay = process.env.TARGET_DAY || 'today';
+  const target = new Date();
+  if (targetDay === 'tomorrow') target.setDate(target.getDate() + 1);
+  const dateMatch = `${String(target.getMonth() + 1).padStart(2, '0')}/${String(target.getDate()).padStart(2, '0')}`;
+  const isPreview = targetDay === 'tomorrow';
+  console.log(`対象日: ${dateMatch} ${isPreview ? '(明日の速報)' : '(本日)'}`);
 
   // 今日開催のJRAレースのみフィルタ
   // raceDataから情報を展開
@@ -356,11 +362,13 @@ async function main() {
   console.log(`✅ 本日のJRAレース: ${todayRaces.length}件`);
 
   if (todayRaces.length === 0) {
-    console.log('⚠️ 本日開催のJRAレースなし。Discord通知してスキップ');
+    const tag = isPreview ? '明日' : '本日';
+    console.log(`⚠️ ${tag}開催のJRAレースなし。Discord通知してスキップ`);
     if (DISCORD_WEBHOOK) {
+      const dateStr = todayStr(isPreview ? 1 : 0);
       await fetch(DISCORD_WEBHOOK, {
         method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ content: `📭 ${todayStr()} 本日開催のJRAレースはありません` })
+        body: JSON.stringify({ content: `📭 ${dateStr} ${tag}開催のJRAレースはありません` })
       });
     }
     return;
@@ -421,7 +429,8 @@ async function main() {
   console.log(`🔥 激熱レース: ${showdownRaces.length}件`);
 
   // 4. 投稿テキスト生成
-  const date = todayStr();
+  const date = todayStr(isPreview ? 1 : 0);
+  const previewTag = isPreview ? '【明日の速報】' : '';
   const venues = [...new Set(results.map(r => r.venue))].join('・');
   const posts = {
     x: generateXPost(date, results, showdownRaces),
@@ -436,8 +445,9 @@ async function main() {
   fs.writeFileSync(path.join(docsDir, 'index.html'), html);
   console.log('✅ docs/index.html 保存');
 
-  // 履歴も保存
-  const archiveName = `${date.replace(/\//g,'-')}.html`;
+  // 履歴も保存（速報の場合は別ファイル名）
+  const suffix = process.env.TARGET_DAY === 'tomorrow' ? '-preview' : '';
+  const archiveName = `${date.replace(/\//g,'-')}${suffix}.html`;
   fs.writeFileSync(path.join(docsDir, archiveName), html);
   console.log(`✅ docs/${archiveName} 保存`);
 
