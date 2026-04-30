@@ -2,9 +2,20 @@ name: Weekly Race Prediction Post
 
 on:
   schedule:
-    # 土曜・日曜の朝9:30 JST = UTC 00:30
-    - cron: '0 0 * * *'  # 毎日 9:00 JST (UTC 0:00)
-  workflow_dispatch:  # 手動実行も可能
+    # 毎日朝9:00 JST = UTC 0:00 (本日のレース)
+    - cron: '0 0 * * *'
+    # 金曜日のみ朝8:00 JST = UTC 23:00 (木曜UTC) (明日=土曜の速報)
+    - cron: '0 23 * * 4'
+  workflow_dispatch:
+    inputs:
+      target_day:
+        description: '対象日 (today=本日 / tomorrow=明日の速報)'
+        required: false
+        default: 'today'
+        type: choice
+        options:
+          - today
+          - tomorrow
 
 permissions:
   contents: write
@@ -21,11 +32,24 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Determine target day
+        id: target
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "target_day=${{ github.event.inputs.target_day }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 23 * * 4" ]; then
+            # 金曜朝の速報実行
+            echo "target_day=tomorrow" >> $GITHUB_OUTPUT
+          else
+            echo "target_day=today" >> $GITHUB_OUTPUT
+          fi
+
       - name: Generate posts
         env:
           APP_URL: https://zettaikeiba7-ai-app-1.onrender.com
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          TARGET_DAY: ${{ steps.target.outputs.target_day }}
         run: node scripts/generate_posts.js
 
       - name: Commit and push results
