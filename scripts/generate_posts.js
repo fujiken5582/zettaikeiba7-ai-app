@@ -31,29 +31,50 @@ async function fetchPost(url, body) {
   return await res.json();
 }
 
-// 日付フォーマット
-function todayStr(offsetDays = 0) {
+// 日付フォーマット（JST=UTC+9で統一）
+function jstDate(offsetDays = 0) {
   const d = new Date();
-  if (offsetDays !== 0) d.setDate(d.getDate() + offsetDays);
-  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+  // UTCにJSTオフセット9時間を足してから日付処理
+  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  if (offsetDays !== 0) jst.setUTCDate(jst.getUTCDate() + offsetDays);
+  return jst;
+}
+function todayStr(offsetDays = 0) {
+  const d = jstDate(offsetDays);
+  return `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}`;
 }
 
-// 投稿テキスト生成（X用） - Top3印付き
+// 投稿テキスト生成（X用） - Top3印付き・日付別
 function generateXPost(date, races, showdownRaces) {
-  const venues = [...new Set(races.map(r => r.venue))].join('・');
-  const previewMark = process.env.TARGET_DAY === 'tomorrow' ? '【⚡明日の速報⚡】' : '';
-  let text = `🐎 ${previewMark}${date} ${venues} AI予測\n`;
+  const td = process.env.TARGET_DAY || 'today';
+  const previewMark = td === 'tomorrow' ? '【⚡明日の速報⚡】' : (td === 'weekend' ? '【⚡今週末の速報⚡】' : '');
+
+  // 日付ごとにグループ化
+  const byDate = {};
+  races.forEach(r => {
+    const d = r.dateDisplay || date;
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(r);
+  });
+
+  let text = `🐎 ${previewMark}\n`;
   text += `📊 競馬予想AI ホライゾン\n`;
   text += `━━━━━━━━━━━━━━\n\n`;
 
-  // 全レース印付きで羅列
-  races.forEach(r => {
-    const flame = r.isShowdown ? '🔥' : '';
-    text += `【${r.venue}${r.raceNum}R】${r.raceName}${flame}\n`;
-    text += `◎${r.top1Name} ${r.top1Score}\n`;
-    if (r.top2Name) text += `○${r.top2Name} ${r.top2Score}\n`;
-    if (r.top3Name) text += `▲${r.top3Name} ${r.top3Score}\n`;
-    text += `\n`;
+  // 日付ごとに表示
+  Object.keys(byDate).sort().forEach(dateKey => {
+    const dayRaces = byDate[dateKey];
+    const venues = [...new Set(dayRaces.map(r => r.venue))].join('・');
+    text += `📅 ${dateKey} ${venues}\n\n`;
+    dayRaces.forEach(r => {
+      const flame = r.isShowdown ? '🔥' : '';
+      text += `【${r.venue}${r.raceNum}R】${r.raceName}${flame}\n`;
+      text += `◎${r.top1Name} ${r.top1Score}\n`;
+      if (r.top2Name) text += `○${r.top2Name} ${r.top2Score}\n`;
+      if (r.top3Name) text += `▲${r.top3Name} ${r.top3Score}\n`;
+      text += `\n`;
+    });
+    text += `━━━━━━━━━━━━━━\n\n`;
   });
 
   if (showdownRaces.length > 0) {
@@ -146,7 +167,8 @@ function generateBlueskyPost(date, races, showdownRaces) {
 async function notifyDiscord(date, races, showdownRaces) {
   if (!DISCORD_WEBHOOK) return;
 
-  const previewMark = process.env.TARGET_DAY === 'tomorrow' ? '⚡【明日の速報】' : '';
+  const td = process.env.TARGET_DAY || 'today';
+  const previewMark = td === 'tomorrow' ? '⚡【明日の速報】' : (td === 'weekend' ? '⚡【今週末の速報】' : '');
   const embed = {
     title: `📩 ${previewMark}${date} AI予測 準備完了`,
     description: `今週は **${races.length}レース** の予測が完了しました。`,
@@ -328,13 +350,37 @@ async function main() {
   const allRaces = raceList.data || raceList.races || [];
   console.log(`✅ ${allRaces.length}レース取得`);
 
-  // 2. 対象日を決定（環境変数 TARGET_DAY: 'today' or 'tomorrow'）
+  // 2. 対象日を決定（環境変数 TARGET_DAY）JST基準
+  // 'today': 本日 / 'tomorrow': 明日 / 'weekend': 今週末（土日両方）
   const targetDay = process.env.TARGET_DAY || 'today';
-  const target = new Date();
-  if (targetDay === 'tomorrow') target.setDate(target.getDate() + 1);
-  const dateMatch = `${String(target.getMonth() + 1).padStart(2, '0')}/${String(target.getDate()).padStart(2, '0')}`;
-  const isPreview = targetDay === 'tomorrow';
-  console.log(`対象日: ${dateMatch} ${isPreview ? '(明日の速報)' : '(本日)'}`);
+  const fmtDate = d => `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}`;
+  let targetDates = [];
+
+  if (targetDay === 'tomorrow') {
+    targetDates.push(fmtDate(jstDate(1)));
+  } else if (targetDay === 'weekend') {
+    // JST基準で今週末（土日）の日付を計算
+    const todayJst = jstDate(0);
+    const dayOfWeek = todayJst.getUTCDay(); // 0=日 1=月 ... 6=土
+    let daysUntilSat;
+    if (dayOfWeek === 6) {
+      daysUntilSat = 0; // 今日が土曜
+    } else if (dayOfWeek === 0) {
+      daysUntilSat = -1; // 今日が日曜なら昨日が土曜（既に終わっている）→次の土曜まで6日
+      daysUntilSat = 6;
+    } else {
+      daysUntilSat = 6 - dayOfWeek; // 月～金: 次の土曜まで
+    }
+    targetDates.push(fmtDate(jstDate(daysUntilSat)));
+    targetDates.push(fmtDate(jstDate(daysUntilSat + 1)));
+  } else {
+    targetDates.push(fmtDate(jstDate(0)));
+  }
+
+  const isPreview = targetDay === 'tomorrow' || targetDay === 'weekend';
+  const isWeekendPreview = targetDay === 'weekend';
+  console.log(`TARGET_DAY=${targetDay}, JST今: ${jstDate(0).toISOString()}`);
+  console.log(`対象日: ${targetDates.join(', ')} ${isPreview ? '(速報)' : '(本日)'}`);
 
   // 今日開催のJRAレースのみフィルタ
   // raceDataから情報を展開
@@ -351,15 +397,26 @@ async function main() {
     };
   });
   console.log('サンプル:', JSON.stringify(flattenedRaces[0]));
+  // 全レースの日付分布をログ
+  const dateDist = {};
+  flattenedRaces.forEach(r => {
+    dateDist[r.dateDisplay || 'null'] = (dateDist[r.dateDisplay || 'null'] || 0) + 1;
+  });
+  console.log('日付分布:', JSON.stringify(dateDist));
 
-  // JRAレースのみ対象
+  // JRAレースのみ対象（複数日付対応）
   const todayRaces = flattenedRaces.filter(r => {
-    if (!r.raceId || r.dateDisplay !== dateMatch) return false;
+    if (!r.raceId || !targetDates.includes(r.dateDisplay)) return false;
     // 場所コード（5-6桁目）が30未満ならJRA
     const placeCode = parseInt(r.raceId.substring(4, 6));
     return placeCode < 30;
   });
-  console.log(`✅ 本日のJRAレース: ${todayRaces.length}件`);
+  // 日付ごとに件数表示
+  targetDates.forEach(d => {
+    const count = todayRaces.filter(r => r.dateDisplay === d).length;
+    console.log(`  ${d}: ${count}件`);
+  });
+  console.log(`✅ 対象JRAレース合計: ${todayRaces.length}件`);
 
   if (todayRaces.length === 0) {
     const tag = isPreview ? '明日' : '本日';
@@ -401,6 +458,7 @@ async function main() {
       const score3 = parseFloat(top3.aiScore || 0);
       results.push({
         raceId: race.raceId,
+        dateDisplay: race.dateDisplay,
         venue: race.venue,
         raceNum: race.raceNum,
         raceName: race.raceName || '',
@@ -423,6 +481,12 @@ async function main() {
     }
   }
 
+  // 日付・場所・レース番号でソート
+  results.sort((a, b) => {
+    if (a.raceId.substring(0,8) !== b.raceId.substring(0,8)) return a.raceId.substring(0,8).localeCompare(b.raceId.substring(0,8));
+    if (a.venue !== b.venue) return a.venue.localeCompare(b.venue);
+    return parseInt(a.raceNum) - parseInt(b.raceNum);
+  });
   console.log(`\n✅ ${results.length}レース予測完了`);
 
   const showdownRaces = results.filter(r => r.isShowdown);
@@ -446,7 +510,8 @@ async function main() {
   console.log('✅ docs/index.html 保存');
 
   // 履歴も保存（速報の場合は別ファイル名）
-  const suffix = process.env.TARGET_DAY === 'tomorrow' ? '-preview' : '';
+  const td = process.env.TARGET_DAY || 'today';
+  const suffix = td === 'tomorrow' ? '-preview' : (td === 'weekend' ? '-weekend-preview' : '');
   const archiveName = `${date.replace(/\//g,'-')}${suffix}.html`;
   fs.writeFileSync(path.join(docsDir, archiveName), html);
   console.log(`✅ docs/${archiveName} 保存`);
