@@ -1046,8 +1046,7 @@ header{
           <thead>
             <tr>
               <th>順位</th><th>印</th><th>馬番</th><th>馬名</th>
-              <th>AIスコア</th><th>単勝</th><th>期待値</th>
-              <th>騎手</th><th>調教師</th><th>詳細</th>
+              <th>AIスコア</th><th>騎手</th><th>調教師</th><th>詳細</th>
             </tr>
           </thead>
           <tbody id="resultsBody"></tbody>
@@ -1607,13 +1606,9 @@ function renderResults(raceData,predictions,extra={}){
   }
 
   // レース情報
+  $('raceName').textContent=(raceData.raceInfo && raceData.raceInfo.raceName) ? raceData.raceInfo.raceName : ('レース '+(raceData.raceId||''));
   // raceIdから何Rか抽出（末尾2桁）
   const raceNum = raceData.raceId ? parseInt(raceData.raceId.slice(-2))+'R' : '';
-  // 開催名の右に「会場 NR」を小さく表示（例: 3歳未勝利 (東京 1R)）
-  const baseName = (raceData.raceInfo && raceData.raceInfo.raceName) ? raceData.raceInfo.raceName : ('レース '+(raceData.raceId||''));
-  const venueR = [raceData.venueName, raceNum].filter(Boolean).join(' ');
-  const venueRHtml = venueR ? ' <span style="font-size:0.5em;color:var(--muted);font-weight:500;letter-spacing:0;margin-left:8px">('+venueR+')</span>' : '';
-  $('raceName').innerHTML = baseName + venueRHtml;
   const _ri = raceData.raceInfo || {};
   const metaTags=[
     _ri.date || '',
@@ -1692,24 +1687,27 @@ function renderResults(raceData,predictions,extra={}){
     var det=[(p.details&&p.details.weight?p.details.weight+'kg':''),(p.details&&p.details.age?p.details.age+'歳':''),(p.details&&p.details.kinryo?p.details.kinryo+'kg':''),(p.details&&p.details.previousRank?'前走'+p.details.previousRank+'着':'')].filter(Boolean).join(' / ');
     var jockey=p.details&&p.details.jockey?p.details.jockey:'—';
     var trainer=p.details&&p.details.trainer?p.details.trainer:'—';
-
-    // 単勝オッズ列（独立カラム、AIスコア列内では重複表示しない）
+    // 単勝オッズ（AIスコアの下に表示）
+    var oddsInline='';
     var oddsCell='<span style="color:rgba(255,255,255,0.2);font-size:11px">—</span>';
     if(p.odds){
+      var ninkiStr=p.popularity?'<span style="color:var(--muted);font-size:9px;margin-left:4px">'+p.popularity+'人気</span>':'';
+      oddsInline='<div style="margin-top:3px;font-size:12px"><span style="color:#f0c040;font-weight:700">'+p.odds+'倍</span>'+ninkiStr+'</div>';
+      oddsCell='<span style="color:#f0c040;font-weight:700">'+p.odds+'倍</span>';
       var ninkiStr=p.popularity?'<br><span style="font-size:10px;color:var(--muted)">'+p.popularity+'人気</span>':'';
       oddsCell='<span style="color:#f0c040;font-weight:700;font-size:14px">'+p.odds+'倍</span>'+ninkiStr;
     }
-
-    // 期待値列（独立カラム）
+    // 期待値
     var evCell='<span style="color:var(--muted);font-size:11px">—</span>';
     if(p.expectedValue!=null){
       var ec=p.expectedValue>=2.0?'#ff6040':p.expectedValue>=1.5?'#10c070':p.expectedValue>=1.25?'#60d080':'var(--muted)';
       var ew=p.expectedValue>=1.25?'700':'400';
       var evIcon=p.expectedValue>=1.5?'★★ ':p.expectedValue>=1.25?'★ ':'';
       evCell='<span style="color:'+ec+';font-weight:'+ew+'">'+evIcon+p.expectedValue.toFixed(2)+'</span><br><span style="font-size:10px;color:'+(p.isBuy?'#10c070':'var(--muted)')+'">'+p.evLabel+'</span>';
+      // EVもoddsInlineに追加
+      if(p.odds) oddsInline+='<div style="font-size:10px;color:'+ec+';font-weight:'+ew+'">EV:'+p.expectedValue.toFixed(2)+'<span style="color:'+(p.isBuy?'#10c070':'var(--muted)')+';margin-left:3px">'+p.evLabel+'</span></div>';
     }
-
-    return '<tr><td>'+rb+'</td><td>'+mk+'</td><td style="text-align:center;font-weight:600">'+p.horseNumber+'</td><td class="horse-name-cell">'+p.horseName+'</td><td><div class="score-cell"><span class="score-num" style="color:'+barColor+'">'+score.toFixed(2)+'</span><div class="score-bar-bg"><div class="score-bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div></div></td><td style="text-align:center;white-space:nowrap">'+oddsCell+'</td><td style="text-align:center;white-space:nowrap">'+evCell+'</td><td class="jockey-cell">'+jockey+tb+jwr+'</td><td class="trainer-cell">'+trainer+'</td><td class="detail-cell">'+det+'</td></tr>';
+    return '<tr><td>'+rb+'</td><td>'+mk+'</td><td style="text-align:center;font-weight:600">'+p.horseNumber+'</td><td class="horse-name-cell">'+p.horseName+'</td><td><div class="score-cell"><span class="score-num" style="color:'+barColor+'">'+score.toFixed(2)+'</span><div class="score-bar-bg"><div class="score-bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div>'+oddsInline+'</div></td><td style="text-align:center">'+oddsCell+'</td><td style="text-align:center;white-space:nowrap">'+evCell+'</td><td class="jockey-cell">'+jockey+tb+jwr+'</td><td class="trainer-cell">'+trainer+'</td><td class="detail-cell">'+det+'</td></tr>';
   }).join('');
   $('resultsBody').innerHTML=tbody;
 
@@ -1718,14 +1716,14 @@ function renderResults(raceData,predictions,extra={}){
 }
 
 function renderAccuracy(modelInfo){
-  var w1 = parseFloat((modelInfo && modelInfo.accuracy ? modelInfo.accuracy.first : '26.69%').replace('%',''));
-  var w3 = parseFloat((modelInfo && modelInfo.accuracy ? modelInfo.accuracy.top3 : '56.45%').replace('%',''));
-  if(isNaN(w1)) w1=26.69; if(isNaN(w3)) w3=56.45;
+  var w1 = parseFloat((modelInfo && modelInfo.accuracy ? modelInfo.accuracy.first : '28.43%').replace('%',''));
+  var w3 = parseFloat((modelInfo && modelInfo.accuracy ? modelInfo.accuracy.top3 : '48.33%').replace('%',''));
+  if(isNaN(w1)) w1=28.43; if(isNaN(w3)) w3=48.33;
   var items=[
     {label:'1着的中率',sub:'Win Rate',val:w1,color:'#f0c040',max:100,disp:w1.toFixed(1)+'%'},
     {label:'3着内的中率',sub:'Top3 Rate',val:w3,color:'#10c070',max:100,disp:w3.toFixed(1)+'%'},
     {label:'学習データ',sub:'Records',val:493826,color:'#2080ff',max:500000,disp:'493,826'},
-    {label:'特徴量数',sub:'Features',val:49,color:'#c080ff',max:55,disp:'49'},
+    {label:'特徴量数',sub:'Features',val:47,color:'#c080ff',max:50,disp:'47'},
   ];
   var r=44,circ=2*Math.PI*r;
   var h='';

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI競馬予測</title>
+    <meta name="description" content="AIによる高精度な競馬予測アプリケーション">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>AI競馬予測</h1>
+            <button id="menu-btn" class="icon-btn">☰</button>
+        </header>
+
+        <main class="app-content">
+            <section id="prediction-section" class="card">
+                <h2>レース予測</h2>
+                <div class="input-group">
+                    <label for="race-file-input" class="file-upload-btn">
+                        CSVデータを選択
+                        <input type="file" id="race-file-input" accept=".csv">
+                    </label>
+                    <p id="file-status" class="status-text">データ未読み込み</p>
+                </div>
+
+                <div class="action-area">
+                    <button id="predict-btn" class="primary-btn" disabled>予測を実行</button>
+                </div>
+            </section>
+
+            <section id="result-section" class="result-area hidden">
+                <h3>予測結果</h3>
+                <div id="result-list" class="result-list">
+                    <!-- Results will be injected here -->
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-target="home">
+                <span class="icon">🏠</span>
+                <span class="label">ホーム</span>
+            </a>
+            <a href="#" class="nav-item" data-target="history">
+                <span class="icon">📜</span>
+                <span class="label">履歴</span>
+            </a>
+            <a href="#" class="nav-item" data-target="settings">
+                <span class="icon">⚙️</span>
+                <span class="label">設定</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js" type="module"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.error('Service Worker registration failed', err));
+        }
+    </script>
+</body>
+
+</html>

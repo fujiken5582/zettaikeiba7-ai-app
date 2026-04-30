@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><title>テスト</title></head>
+<body style="background:#111;color:#fff;font-family:sans-serif;padding:20px">
+<h2>APIテスト</h2>
+<input id="url" type="text" style="width:600px;padding:8px;background:#222;color:#fff;border:1px solid #555"
+  value="https://race.netkeiba.com/race/shutuba_past.html?race_id=202605020101">
+<br><br>
+<button onclick="runTest()" style="padding:10px 20px;background:#f0c040;color:#000;font-weight:bold;border:none;cursor:pointer">テスト実行</button>
+<pre id="out" style="margin-top:20px;background:#222;padding:16px;overflow:auto;max-height:500px"></pre>
+<script>
+async function runTest() {
+  const out = document.getElementById('out');
+  const url = document.getElementById('url').value;
+  out.textContent = '取得中...\n';
+  
+  try {
+    // Step1: fetch-race
+    const r1 = await fetch('/api/fetch-race', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({url: url})
+    });
+    const d1 = await r1.json();
+    out.textContent += 'fetch-race success:' + d1.success + ' horses:' + (d1.data && d1.data.horses ? d1.data.horses.length : 0) + '\n';
+    if (!d1.success) { out.textContent += 'ERROR: ' + d1.error + '\n'; return; }
+    
+    // Step2: predict
+    const r2 = await fetch('/api/predict', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({horses: d1.data.horses})
+    });
+    const d2 = await r2.json();
+    out.textContent += 'predict success:' + d2.success + '\n';
+    out.textContent += 'predictions count:' + (d2.predictions ? d2.predictions.length : 0) + '\n';
+    out.textContent += 'isShowdown:' + d2.isShowdown + '\n';
+    if (d2.predictions && d2.predictions[0]) {
+      const p = d2.predictions[0];
+      out.textContent += '\n1位馬:\n';
+      out.textContent += '  horseName: ' + p.horseName + '\n';
+      out.textContent += '  aiScore: ' + p.aiScore + '\n';
+      out.textContent += '  isTopJockey: ' + p.isTopJockey + '\n';
+    }
+    out.textContent += '\n✅ API正常動作確認完了';
+  } catch(e) {
+    out.textContent += 'EXCEPTION: ' + e.message + '\n' + e.stack;
+  }
+}
+</script>
+</body>
+</html>

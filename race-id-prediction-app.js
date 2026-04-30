@@ -1,52 +1,24 @@
 // レースID入力でnetkeiba.comからデータ取得してAI予測
 import express from 'express';
 import cors from 'cors';
-import compression from 'compression';
 import fs from 'fs';
-import http from 'http';
-import https from 'https';
 import { fetchShutubaTable, fetchWeekendRaceList } from './src/scraper/netkeibaRealScraper.js';
+import { fetchShutubaPast } from './src/scraper/shutubaPastScraper.js';
 import { predictRace, modelInfo } from './src/model/aiRacePredictor.js';
 
 const app = express();
-
-// === パフォーマンス最適化 ===
-app.use(compression()); // gzip圧縮（HTML/JSON/CSS全て）
 app.use(cors());
 app.use(express.json());
-
-// キャッシュ制御:
-// - HTML: 常に最新（更新が即反映）
-// - JSON/モデルファイル/静的アセット: 1時間キャッシュ
+// キャッシュ無効化（HTMLが常に最新で読み込まれるよう）
 app.use((req, res, next) => {
   if (req.path.endsWith('.html') || req.path === '/') {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-  } else if (req.path.match(/\.(json|css|js|png|jpg|svg|pkl)$/)) {
-    res.setHeader('Cache-Control', 'public, max-age=3600');
   }
   next();
 });
-app.use(express.static('.', { etag: true, lastModified: true }));
-
-// === レース取得結果のメモリキャッシュ（5分間TTL）===
-// 効果: 2回目以降のスクレイピング時間 2-5秒 → 0ms
-const raceCache = new Map();
-const CACHE_TTL_MS = 5 * 60 * 1000;
-function getCachedRace(raceId) {
-  const e = raceCache.get(raceId);
-  if (e && Date.now() - e.t < CACHE_TTL_MS) return e.data;
-  if (e) raceCache.delete(raceId);
-  return null;
-}
-function setCachedRace(raceId, data) {
-  if (raceCache.size >= 50) {
-    const oldest = [...raceCache.entries()].sort((a,b)=>a[1].t-b[1].t)[0];
-    if (oldest) raceCache.delete(oldest[0]);
-  }
-  raceCache.set(raceId, { data, t: Date.now() });
-}
+app.use(express.static('.')); // 静的ファイルを提供
 
 // リクエストロギングミドルウェア
 app.use((req, res, next) => {
@@ -62,7 +34,7 @@ app.get('/api/health', (req, res) => {
 // ルートパス
 app.get('/', (req, res) => {
   res.redirect('/race-id-viewer.html');
-});
+});;
 
 console.log("=== レースID予測アプリ起動 ===\n");
 console.log("✅ AIモデルを読み込みました");
@@ -95,6 +67,7 @@ app.get('/api/race-list', async (req, res) => {
   try {
     console.log('今週のレース一覧を取得リクエスト');
     const races = await fetchWeekendRaceList();
+    console.log(`取得完了: ${races.length}件`);
     console.log(`取得完了: ${races.length}件`);
 
     // データをサニタイズして送信
@@ -145,18 +118,6 @@ app.post('/api/fetch-race', async (req, res) => {
     const raceId = raceIdMatch[1];
     console.log(`抽出されたレースID: ${raceId}`);
 
-    // === キャッシュチェック（5分以内なら即返答）===
-    const cached = getCachedRace(raceId);
-    if (cached) {
-      const duration = Date.now() - startTime;
-      console.log(`✅ キャッシュヒット ${raceId} (${duration}ms)`);
-      return res.json({
-        success: true,
-        data: cached,
-        meta: { fetchTime: duration, cached: true, timestamp: new Date().toISOString() }
-      });
-    }
-
     // fetchShutubaTable が中央・地方を自動判定して取得
     let raceData;
     try {
@@ -174,9 +135,6 @@ app.post('/api/fetch-race', async (req, res) => {
       });
     }
 
-    // 取得成功 → キャッシュ保存
-    setCachedRace(raceId, raceData);
-
     const duration = Date.now() - startTime;
     console.log(`✅ ${raceData.horses.length}頭のデータを取得しました (所要時間: ${duration}ms)`);
 
@@ -185,7 +143,6 @@ app.post('/api/fetch-race', async (req, res) => {
       data: raceData,
       meta: {
         fetchTime: duration,
-        cached: false,
         timestamp: new Date().toISOString()
       }
     });
@@ -215,14 +172,15 @@ app.post('/api/predict', (req, res) => {
     const paceRpci = manualPace === 'slow' ? 55 : manualPace === 'high' ? 43 : null;
     const horsesWithManual = horses.map(h => ({
       ...h,
-      RPCI: paceRpci !== null ? paceRpci : (h.RPCI ?? 50),
-      PCI: paceRpci !== null ? paceRpci : (h.PCI ?? 50),
+      RPCI: paceRpci !== null ? paceRpci : (h.RPCI || 50),
+      PCI: paceRpci !== null ? paceRpci : (h.PCI || 50),
     }));
-    const predResult = predictRace(horsesWithManual);
-    // predictRaceは常に {horses, isShowdown, showdownReason, betSummary} を返す
-    const predHorses = predResult.horses || [];
+    const predResult = predictRace(horsesWithManual, trainerStats, sireStats);
+    // 新形式 or 旧形式に対応
+    const predHorses = predResult.horses || predResult;
     const isShowdown = predResult.isShowdown || false;
     const showdownReason = predResult.showdownReason || '';
+
     const betSummary = predResult.betSummary || [];
     res.json({
       success: true,
@@ -248,16 +206,17 @@ app.post('/api/predict', (req, res) => {
           rank: i + 1,
           horseName: horse.name || horse.horseName || '不明',
           horseNumber: horse.horseNumber,
-          popularity: horse.popularity ?? null,
+          popularity: horse.popularity,
           aiScore: score.toFixed(2),
           confidence: (confidence * 100).toFixed(1) + '%',
           recommendation: i < 3 ? '◎○▲'[i] : '',
           isTopJockey,
           jockeyWinRate: (jockeyWinRate * 100).toFixed(1) + '%',
-          odds: horse.odds ?? null,
-          expectedValue: horse.expectedValue ?? null,
+          odds: horse.odds || null,
+          popularity: horse.popularity || null,
+          expectedValue: horse.expectedValue || null,
           evLabel: horse.evLabel || 'オッズ未発表',
-          isBuy: horse.isBuy ?? null,
+          isBuy: horse.isBuy || null,
           details: {
             weight: horse.weight,
             age: horse.age,
@@ -301,6 +260,7 @@ app.get('/api/model-info', (req, res) => {
 const PORT = process.env.PORT || 3004;
 // 起動前にpython3とモデルを確認
 import { execFileSync as _execCheck } from 'child_process';
+import { join as _join } from 'path';
 const _ROOT = new URL('.', import.meta.url).pathname;
 try {
   const _py = process.env.PYTHON_CMD || 'python3';
@@ -311,72 +271,15 @@ try {
   ], {timeout:15000, cwd:_ROOT}).toString().trim();
   console.log('✅ Model:', _mcheck);
 } catch(_e) {
-  console.error('⚠️  Python/Modelチェック失敗:', _e.message.substring(0,300));
-  console.error('   → 予測実行時にフォールバックモードで動作します');
+  console.error('❌ Python/Modelチェック失敗:', _e.message.substring(0,300));
 }
 
-const server = app.listen(PORT, async () => {
-  console.log(`\n${'='.repeat(50)}`);
-  console.log(`🚀 サーバー起動完了!`);
-  console.log(`${'='.repeat(50)}`);
-  console.log(`\n📱 ブラウザで以下のURLを開いてください:`);
-  console.log(`   http://localhost:${PORT}/race-id-viewer.html\n`);
-
-  // LAN内のスマホ等から繋ぐためのIPアドレスも表示
-  try {
-    const os = await import('os');
-    const nets = os.networkInterfaces();
-    const lanIps = [];
-    for (const name of Object.keys(nets)) {
-      for (const net of (nets[name] || [])) {
-        if (net.family === 'IPv4' && !net.internal) lanIps.push(net.address);
-      }
-    }
-    if (lanIps.length > 0) {
-      console.log(`📲 同じWi-Fiのスマホ・タブレットからは↓のURLでアクセス可能:`);
-      lanIps.forEach(ip => console.log(`   http://${ip}:${PORT}/race-id-viewer.html`));
-      console.log(`   ※ Windowsの場合、ファイアウォールで Node.js を許可してください\n`);
-    }
-  } catch (e) { /* IP取得失敗時は無視 */ }
-
-  console.log(`💡 起動スクリプト経由なら自動でブラウザが開きます`);
-  console.log(`🛑 停止するには Ctrl+C を押してください\n`);
-
-  // === コールドスタート対策（Render無料版用）===
-  // RENDER_EXTERNAL_URL が設定されていれば、14分おきに自己pingしてスリープを防ぐ
-  if (process.env.RENDER_EXTERNAL_URL) {
-    const pingUrl = `${process.env.RENDER_EXTERNAL_URL.replace(/\/$/,'')}/api/health`;
-    console.log(`🔄 自己ping機能を有効化: 14分ごとに ${pingUrl}`);
-    setInterval(() => {
-      const lib = pingUrl.startsWith('https:') ? https : http;
-      const req = lib.get(pingUrl, (res) => {
-        console.log(`[self-ping] ${new Date().toISOString()} status=${res.statusCode}`);
-        res.resume();
-      });
-      req.on('error', (e) => console.error(`[self-ping] error: ${e.message}`));
-      req.setTimeout(10000, () => req.destroy());
-    }, 14 * 60 * 1000);
-  }
-});
-
-// ポート競合などの起動エラー処理
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`\n❌ ポート ${PORT} は既に使用されています`);
-    console.error(`\n解決方法:`);
-    console.error(`  1. 既に動いているサーバーを停止する`);
-    console.error(`     → 別のターミナル/コマンドプロンプトで Ctrl+C`);
-    console.error(`  2. または別のポートで起動する:`);
-    console.error(`     Windows: set PORT=3005 && node race-id-prediction-app.js`);
-    console.error(`     Mac/Linux: PORT=3005 node race-id-prediction-app.js`);
-  } else {
-    console.error(`\n❌ サーバー起動エラー: ${err.message}`);
-  }
-  process.exit(1);
-});
-
-// 終了シグナルを綺麗に処理
-process.on('SIGINT', () => {
-  console.log(`\n\n👋 サーバーを停止しました`);
-  server.close(() => process.exit(0));
+app.listen(PORT, () => {
+  console.log(`\n🚀 サーバー起動完了!`);
+  console.log(`\nAPI エンドポイント:`);
+  console.log(`  GET  /api/race-list - 今週のレース一覧`);
+  console.log(`  POST /api/fetch-race - レースデータ取得`);
+  console.log(`  POST /api/predict - レース予測`);
+  console.log(`  GET  /api/model-info - モデル情報`);
+  console.log(`\nWebインターフェース: http://localhost:${PORT}/race-id-viewer.html`);
 });
