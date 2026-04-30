@@ -37,26 +37,47 @@ function todayStr() {
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 }
 
-// 投稿テキスト生成（X用）
+// 投稿テキスト生成（X用） - Top3印付き
 function generateXPost(date, races, showdownRaces) {
   const venues = [...new Set(races.map(r => r.venue))].join('・');
   let text = `🐎 ${date} ${venues} AI予測\n`;
-  text += `📊 競馬予想AI ホライゾン\n\n`;
+  text += `📊 競馬予想AI ホライゾン\n`;
+  text += `━━━━━━━━━━━━━━\n\n`;
+
+  // 全レース印付きで羅列
+  races.forEach(r => {
+    const flame = r.isShowdown ? '🔥' : '';
+    text += `【${r.venue}${r.raceNum}R】${r.raceName}${flame}\n`;
+    text += `◎${r.top1Name} ${r.top1Score}\n`;
+    if (r.top2Name) text += `○${r.top2Name} ${r.top2Score}\n`;
+    if (r.top3Name) text += `▲${r.top3Name} ${r.top3Score}\n`;
+    text += `\n`;
+  });
 
   if (showdownRaces.length > 0) {
-    text += `🔥 激熱レース ${showdownRaces.length}件\n`;
-    showdownRaces.slice(0, 3).forEach(r => {
-      text += `▶${r.venue}${r.raceNum} ${r.raceName}\n`;
-      text += ` ◎${r.top1Name}（${r.top1Jockey}）\n`;
-      text += ` 📈AIスコア${r.top1Score} (差${r.gap})\n`;
-    });
-    text += `\n`;
+    text += `🔥 激熱 ${showdownRaces.length}R\n`;
   }
-
-  text += `📋 全予測 → ${process.env.PAGES_URL || 'https://fujiken5582.github.io/zettai-atarukun/'}\n\n`;
-  text += `#競馬予想 #AI予想 #ホライゾン #競馬`;
+  text += `\n📋詳細→ ${process.env.PAGES_URL || 'https://fujiken5582.github.io/zettai-atarukun/'}\n`;
+  text += `#競馬予想 #AI予想 #ホライゾン`;
 
   return text;
+}
+
+// X用：分割版（1ツイート1レース、複数投稿用）
+function generateXPostsSplit(date, races) {
+  return races.map(r => {
+    const flame = r.isShowdown ? '🔥激熱🔥' : '';
+    let text = `🐎 ${date} ${r.venue}${r.raceNum}R ${r.raceName}\n`;
+    if (flame) text += `${flame}\n`;
+    text += `\n`;
+    text += `◎ ${r.top1Name}（${r.top1Jockey}） ${r.top1Score}\n`;
+    if (r.top2Name) text += `○ ${r.top2Name}（${r.top2Jockey}） ${r.top2Score}\n`;
+    if (r.top3Name) text += `▲ ${r.top3Name}（${r.top3Jockey}） ${r.top3Score}\n`;
+    text += `\n`;
+    text += `競馬予想AI ホライゾン\n`;
+    text += `#競馬予想 #${r.venue}競馬 #ホライゾン`;
+    return text;
+  });
 }
 
 // note用Markdown生成
@@ -71,19 +92,23 @@ function generateNoteMarkdown(date, races, showdownRaces, venue) {
     md += `AIスコアが特に高く、上位馬との差が大きい注目レースです。\n\n`;
     showdownRaces.forEach(r => {
       md += `### ${r.venue}${r.raceNum}R ${r.raceName}\n\n`;
-      md += `- **AI 1位推奨**: ${r.top1Name}（${r.top1Jockey}騎手）\n`;
-      md += `- **AIスコア**: ${r.top1Score}\n`;
+      md += `- ◎ **本命**: ${r.top1Name}（${r.top1Jockey}騎手） スコア${r.top1Score}\n`;
+      if (r.top2Name) md += `- ○ **対抗**: ${r.top2Name}（${r.top2Jockey}騎手） スコア${r.top2Score}\n`;
+      if (r.top3Name) md += `- ▲ **単穴**: ${r.top3Name}（${r.top3Jockey}騎手） スコア${r.top3Score}\n`;
       md += `- **2位との差**: ${r.gap}\n\n`;
     });
     md += `---\n\n`;
   }
 
   md += `## 📊 全レース予測一覧\n\n`;
-  md += `| R | レース名 | AI 1位 | スコア | 差 |\n`;
-  md += `|---|---------|--------|--------|----|\n`;
+  md += `| R | レース名 | ◎本命 | ○対抗 | ▲単穴 |\n`;
+  md += `|---|---------|--------|--------|--------|\n`;
   races.forEach(r => {
     const sd = r.isShowdown ? ' 🔥' : '';
-    md += `| ${r.raceNum} | ${r.raceName} | ${r.top1Name}（${r.top1Jockey}）${sd} | ${r.top1Score} | ${r.gap} |\n`;
+    const t1 = r.top1Name ? `${r.top1Name}(${r.top1Score})` : '-';
+    const t2 = r.top2Name ? `${r.top2Name}(${r.top2Score})` : '-';
+    const t3 = r.top3Name ? `${r.top3Name}(${r.top3Score})` : '-';
+    md += `| ${r.raceNum} | ${r.raceName}${sd} | ${t1} | ${t2} | ${t3} |\n`;
   });
 
   md += `\n---\n\n`;
@@ -100,12 +125,15 @@ function generateNoteMarkdown(date, races, showdownRaces, venue) {
 }
 
 // Bluesky用テキスト
-function generateBlueskyPost(date, showdownRaces) {
+function generateBlueskyPost(date, races, showdownRaces) {
   let text = `🐎 ${date} AI競馬予測\n📊 競馬予想AI ホライゾン\n\n`;
   if (showdownRaces.length > 0) {
     text += `🔥 激熱 ${showdownRaces.length}件\n`;
     showdownRaces.slice(0, 2).forEach(r => {
-      text += `▶${r.venue}${r.raceNum} ◎${r.top1Name}\n`;
+      text += `【${r.venue}${r.raceNum}R】\n`;
+      text += `◎${r.top1Name} ${r.top1Score}\n`;
+      if (r.top2Name) text += `○${r.top2Name} ${r.top2Score}\n`;
+      if (r.top3Name) text += `▲${r.top3Name} ${r.top3Score}\n`;
     });
   }
   text += `\n全予測→ ${process.env.PAGES_URL || 'https://fujiken5582.github.io/zettai-atarukun/'}`;
@@ -124,8 +152,22 @@ async function notifyDiscord(date, races, showdownRaces) {
       {
         name: '🔥 激熱レース',
         value: showdownRaces.length > 0
-          ? showdownRaces.map(r => `**${r.venue}${r.raceNum}** ${r.raceName}\n　◎${r.top1Name}（差${r.gap}）`).join('\n\n')
-          : '今週は激熱レースなし',
+          ? showdownRaces.slice(0, 5).map(r => {
+              let s = `**${r.venue}${r.raceNum}R** ${r.raceName}\n`;
+              s += `◎${r.top1Name} (${r.top1Score})\n`;
+              if (r.top2Name) s += `○${r.top2Name} (${r.top2Score})\n`;
+              if (r.top3Name) s += `▲${r.top3Name} (${r.top3Score})`;
+              return s;
+            }).join('\n\n')
+          : '本日は激熱レースなし',
+        inline: false
+      },
+      {
+        name: '🐎 全レース予想',
+        value: races.slice(0, 12).map(r => {
+          const sd = r.isShowdown ? '🔥' : '　';
+          return `${sd} **${r.venue}${r.raceNum}R** ◎${r.top1Name}(${r.top1Score}) ○${r.top2Name}(${r.top2Score}) ▲${r.top3Name}(${r.top3Score})`;
+        }).join('\n'),
         inline: false
       },
       {
@@ -156,7 +198,13 @@ function generateHtml(date, posts, races, showdownRaces) {
   let raceTableRows = '';
   races.forEach(r => {
     const sd = r.isShowdown ? '🔥' : '';
-    raceTableRows += `<tr><td>${escapeHtml(r.venue + r.raceNum)}</td><td>${escapeHtml(r.raceName)}</td><td><strong>${escapeHtml(r.top1Name)}</strong><br><span class="muted">${escapeHtml(r.top1Jockey)}</span></td><td>${r.top1Score}</td><td>${r.gap}</td><td>${sd}</td></tr>`;
+    const rowClass = r.isShowdown ? ' class="showdown-row"' : '';
+    raceTableRows += `<tr${rowClass}>` +
+      `<td><strong>${escapeHtml(r.venue + r.raceNum + 'R')}</strong><br><span class="muted">${escapeHtml(r.raceName)} ${sd}</span></td>` +
+      `<td>◎ <strong>${escapeHtml(r.top1Name)}</strong><br><span class="muted">${escapeHtml(r.top1Jockey)} ${r.top1Score}</span></td>` +
+      `<td>○ ${escapeHtml(r.top2Name)}<br><span class="muted">${escapeHtml(r.top2Jockey)} ${r.top2Score}</span></td>` +
+      `<td>▲ ${escapeHtml(r.top3Name)}<br><span class="muted">${escapeHtml(r.top3Jockey)} ${r.top3Score}</span></td>` +
+      `</tr>`;
   });
 
   return `<!DOCTYPE html>
@@ -241,7 +289,7 @@ td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); }
     <h2>📊 全レース予測一覧</h2>
     <table>
       <thead>
-        <tr><th>R</th><th>レース</th><th>AI 1位</th><th>スコア</th><th>差</th><th>判定</th></tr>
+        <tr><th>レース</th><th>◎ 本命</th><th>○ 対抗</th><th>▲ 単穴</th></tr>
       </thead>
       <tbody>${raceTableRows}</tbody>
     </table>
@@ -336,19 +384,28 @@ async function main() {
       if (!fetchData.success || !fetchData.data || !fetchData.data.horses) { console.log(' SKIP'); continue; }
       const predictData = await fetchPost(`${APP_URL}/api/predict`, { horses: fetchData.data.horses });
       if (!predictData.success || !predictData.predictions) { console.log(' SKIP'); continue; }
-      const top1 = predictData.predictions[0];
-      const top2 = predictData.predictions[1];
+      const preds = predictData.predictions || [];
+      const top1 = preds[0] || {};
+      const top2 = preds[1] || {};
+      const top3 = preds[2] || {};
       const score1 = parseFloat(top1.aiScore || 0);
-      const score2 = parseFloat(top2 ? top2.aiScore : 0);
+      const score2 = parseFloat(top2.aiScore || 0);
+      const score3 = parseFloat(top3.aiScore || 0);
       results.push({
         raceId: race.raceId,
         venue: race.venue,
         raceNum: race.raceNum,
         raceName: race.raceName || '',
         isJRA: isJRA,
-        top1Name: top1.horseName,
+        top1Name: top1.horseName || '',
         top1Jockey: (top1.details && top1.details.jockey) || '',
         top1Score: score1.toFixed(1),
+        top2Name: top2.horseName || '',
+        top2Jockey: (top2.details && top2.details.jockey) || '',
+        top2Score: score2.toFixed(1),
+        top3Name: top3.horseName || '',
+        top3Jockey: (top3.details && top3.details.jockey) || '',
+        top3Score: score3.toFixed(1),
         gap: (score1 - score2).toFixed(1),
         isShowdown: predictData.isShowdown || false,
       });
@@ -369,7 +426,7 @@ async function main() {
   const posts = {
     x: generateXPost(date, results, showdownRaces),
     note: generateNoteMarkdown(date, results, showdownRaces, venues),
-    bluesky: generateBlueskyPost(date, showdownRaces),
+    bluesky: generateBlueskyPost(date, results, showdownRaces),
   };
 
   // 5. HTML生成・保存
