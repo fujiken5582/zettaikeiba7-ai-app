@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2026/10/17 競馬予想AI ホライゾン</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, "Hiragino Sans", sans-serif; background: #0a0a14; color: #e8e8f0; line-height:1.6; min-height:100vh; }
+.container { max-width: 800px; margin: 0 auto; padding: 24px 16px 80px; }
+header { text-align:center; padding: 40px 0 30px; }
+h1 { font-size: 28px; background: linear-gradient(135deg,#fff,#f0c040,#e8a000); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:6px; }
+.sub { color: #888; font-size: 13px; letter-spacing: 0.1em; }
+.section { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.section h2 { font-size: 15px; color:#f0c040; margin-bottom: 12px; letter-spacing: 0.05em; }
+.post-box { position: relative; }
+.post-text { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 14px; font-family: ui-monospace, monospace; font-size: 13px; white-space: pre-wrap; word-break: break-word; max-height: 280px; overflow-y: auto; color: #ddd; }
+.copy-btn { display: block; width: 100%; margin-top: 10px; background: linear-gradient(135deg,#f0c040,#e8a000); color: #000; font-weight: 700; border: none; border-radius: 8px; padding: 12px; font-size: 14px; cursor: pointer; transition: transform 0.2s; }
+.copy-btn:hover { transform: translateY(-2px); }
+.copy-btn.copied { background: linear-gradient(135deg,#10c070,#0d9050); color: #fff; }
+.share-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.share-btn { flex:1; min-width:120px; text-align:center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; color: #ddd; text-decoration: none; font-size: 13px; transition: background 0.2s; }
+.share-btn:hover { background: rgba(255,255,255,0.1); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: rgba(255,255,255,0.04); padding: 10px 8px; text-align: left; color: #888; font-size: 11px; letter-spacing: 0.1em; border-bottom: 1px solid rgba(255,255,255,0.1); }
+td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.muted { color: #888; font-size: 11px; }
+.showdown-row { background: rgba(255,100,0,0.08); }
+.showdown-row td:first-child { border-left: 3px solid #ff8800; }
+.note-link { display: inline-block; margin-top: 12px; color: #f0c040; text-decoration: underline; font-size: 13px; }
+@media(max-width:600px) {
+  h1 { font-size: 22px; }
+  .section { padding: 16px; }
+  .post-text { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🐎 2026/10/17 競馬予想AI ホライゾン</h1>
+    <p class="sub">AI予測 72レース / 激熱 0件</p>
+  </header>
+
+  <div class="section">
+    <h2>𝕏 X用投稿（コピペで投稿）</h2>
+    <div class="post-box">
+      <div class="post-text" id="xText">🐎 【⚡今週末の速報⚡】
+📊 競馬予想AI ホライゾン
+━━━━━━━━━━━━━━
+
+📅 10/17 新潟・東京・京都
+
+【新潟R】新潟 1R
+◎�����激�с����ャ�純����ゃ�� 12.0
+○��違����若�潟�≪�ゃ����潟�� 7.1
+▲��鴻�ゃ�若����≪�������泣�� 6.6
+
+【新潟R】新潟 2R
+◎��������若�泣�潟�� 16.3
+○�����������鴻����㏍�若�� 11.3
+▲�����ゃ�鴻�������ゃ�潟�� 8.3
+
+【新潟R】新潟 3R
+◎�����������ｃ�若�� 6.4
+○��鴻�������潟�違�違�㏍�若�� 6.4
+▲��������潟����若����ゃ�� 6.3
+
+【新潟R】新潟 4R
+◎��㏍�若����с����激�� 12.7
+○��㏍�≪����＜�潟�� 8.4
+▲��激�≪�������� 5.9
+
+【新潟R】新潟 5R
+◎�����眼�с�������㏍����� 3.3
+○�����ゃ�違����������潟����� 3.3
+▲��������眼�� 3.3
+
+【新潟R】新潟 6R
+◎��潟����ｃ�����B 10.2
+○�����������ゃ�㏍�ｃ����鴻�� 10.0
+▲�����若����潟����若����� 5.6
+
+【新潟R】新潟 7R
+◎��泣�������������激����� 25.7
+○�����������障�潟����若�� 25.2
+▲��������潟�眼�с�鴻�����B 25.0
+
+【新潟R】新潟 8R
+◎��������若�鴻����ゃ�������� 8.7
+○�����潟����������＜�若�� 7.7
+▲��若����������ゃ�� 5.6
+
+【新潟R】新潟 9R
+◎��潟�鴻�≪�������� 36.8
+○������������ 27.4
+▲�����ｃ����鴻����若�� 22.6
+
+【新潟R】新潟 10R
+◎��������潟�≪�潟����㏍�若�� 7.3
+○�����ゃ����泣�潟�泣�� 6.8
+▲�����冴����潟�違����潟��B 6.0
+
+【新潟R】新潟 11R
+◎��泣����������若�違����� 7.3
+○�����������㏍����若��B 6.8
+▲��＜�ゃ�激�с�������若�� 6.6
+
+【新潟R】新潟 12R
+◎��������������������若����� 6.4
+○�����帥�激�ゃ�������������� 5.8
+▲��������������若�� 5.6
+
+【東京R】東京 1R
+◎��������≪�潟�� 4.0
+○�����������ゃ����ｃ�� 2.7
+▲��≪�������潟�若�� 2.5
+
+【東京R】東京 2R
+◎��鴻����若�眼����激�������� 26.3
+○��吾�若�������若����� 13.1
+▲�����ｃ�≪����鴻����������� 9.2
+
+【東京R】東京 3R
+◎�����������������㏍�� 20.6
+○�����ャ�若�㏍����＜�ゃ�帥�� 16.9
+▲�����吾�ャ�������������潟�� 10.3
+
+【東京R】東京 4R
+◎��㏍�吾����������� 3.3
+○��������������＜�ゃ�� 3.3
+▲������������������ 3.3
+
+【東京R】東京 5R
+◎�����若����≪����潟�吾�ｃ�� 3.2
+○��������������� 3.2
+▲�����ｃ����若�� 3.2
+
+【東京R】東京 6R
+◎��帥�ゃ�祉�ゃ����������� 6.7
+○��激�眼�ｃ�若�帥�� 6.3
+▲��������激�ｃ�ゃ����� 4.3
+
+【東京R】東京 7R
+◎�����≪����ゃ�冴����若����� 20.9
+○��≪�������鴻����純�若�� 7.8
+▲��ゃ�潟�違�≪�＜�������潟�� 4.0
+
+【東京R】東京 8R
+◎�����若�鴻�������ゃ�� 17.0
+○�����ャ�������������� 12.7
+▲��≪�若����潟�≪�ゃ����潟�� 8.2
+
+【東京R】東京 9R
+◎��������������激�с�若�� 30.7
+○��違����潟�������ャ�若�� 26.5
+▲�����������若�� 19.4
+
+【東京R】東京 10R
+◎��㏍�潟�違����с�ゃ����若�� 15.7
+○�����ゃ��B 11.0
+▲��ゃ�潟�������≪�������ゃ��B 10.6
+
+【東京R】東京 11R
+◎�����吾�������泣�潟�� 8.5
+○��≪�潟�������� 7.8
+▲�����＜�若�眼�с�潟�� 7.0
+
+【東京R】東京 12R
+◎��帥�ゃ�㏍�������������с��B 6.7
+○�����潟�������吾�с��B 5.0
+▲��激�с�若�������若�� 4.3
+
+【京都R】京都 1R
+◎�����������������≪�潟����� 19.7
+○��������ャ�� 9.0
+▲�����ゃ����������若�激�с�� 4.5
+
+【京都R】京都 2R
+◎��������ゃ����ゃ����㏍�若�� 14.3
+○��潟�������若�� 9.6
+▲��������若�帥�若�吾�с�若�� 5.5
+
+【京都R】京都 3R
+◎��������若�������眼����若�� 26.4
+○��������潟�������若�� 13.8
+▲��帥����������������若����� 6.0
+
+【京都R】京都 4R
+◎��純����������ャ�若�� 18.6
+○��������潟����鴻����冴�� 13.7
+▲��吾�ｃ�鴻����若�違����ゃ�� 1.1
+
+【京都R】京都 5R
+◎�����若�㏍�������若�� 3.2
+○��吾�ャ�若�潟����＜�������� 3.2
+▲�����ｃ�純�鴻�������� 3.2
+
+【京都R】京都 6R
+◎�����ゃ����������� 3.2
+○��帥����≪�������鴻�� 3.2
+▲������������������ 3.2
+
+【京都R】京都 7R
+◎��潟�潟�㏍��������B 11.2
+○�����若����若����吟�若�� 9.3
+▲�����ｃ����� 5.5
+
+【京都R】京都 8R
+◎��＜�≪����若�������� 6.8
+○��������潟����� 6.4
+▲�����ャ����������潟�ゃ�� 6.3
+
+【京都R】京都 9R
+◎��＜�ゃ�激�с����吟�潟�蚊�� 6.1
+○�����������ャ�純����ゃ�� 6.1
+▲��吾�ｃ�潟�������ャ����若�� 5.3
+
+【京都R】京都 10R
+◎��＜�ゃ�激�с�������������� 35.0
+○�����с����眼�＜�若�� 21.2
+▲��������������� 14.8
+
+【京都R】京都 11R
+◎��吾�ャ�若�潟�������� 36.4
+○��潟�潟����ャ�ゃ�� 22.5
+▲�����������鴻����������� 16.0
+
+【京都R】京都 12R
+◎��������㏍����� 10.1
+○��������������������������� 8.6
+▲��泣����ャ��B 7.4
+
+━━━━━━━━━━━━━━
+
+📅 10/18 新潟・東京・京都
+
+【新潟R】新潟 1R
+◎��������若�������� 34.3
+○��吾�ｃ�鴻����若����若�� 7.9
+▲��激�若����若�鴻����若�� 7.3
+
+【新潟R】新潟 2R
+◎��≪�������帥�� 5.8
+○��������������違����� 4.9
+▲�����������潟����若�� 4.5
+
+【新潟R】新潟 3R
+◎��������違����若�� 31.0
+○��ゃ����＜�眼����ャ�� 8.4
+▲��������ゃ�帥�若����ゃ�� 6.3
+
+【新潟R】新潟 4R
+◎��泣����������鴻�宴�若�� 8.2
+○�����ゃ����若�泣�����B 6.1
+▲��激�������若����� 5.7
+
+【新潟R】新潟 5R
+◎�����若����若����ｃ�鴻�帥�� 3.2
+○������������������ 3.2
+▲�����ｃ�������鴻����� 3.2
+
+【新潟R】新潟 6R
+◎��泣����泣����ｃ����ｃ����� 24.8
+○��眼�若����������������� 13.6
+▲�����ｃ����ｃ�� 12.1
+
+【新潟R】新潟 7R
+◎��������潟�吾�с�若�� 5.9
+○��激�ｃ�ゃ�潟�������若����� 5.0
+▲��眼�若�������������若�� 4.5
+
+【新潟R】新潟 8R
+◎�����с����若��B 3.9
+○�����＜�ゃ����帥�潟�� 3.6
+▲�����≪�吾�ｃ����若����� 3.5
+
+【新潟R】新潟 9R
+◎��潟�鴻�≪�������眼�＜�� 18.2
+○�����若����帥�������������� 17.2
+▲�����ゃ�潟��������B 8.6
+
+【新潟R】新潟 10R
+◎��������鴻�������ｃ�若�� 5.8
+○�����吾�若����㏍�若�� 5.6
+▲��鴻�������㏍�ｃ�鴻�帥��B 5.4
+
+【新潟R】新潟 11R
+◎��������ャ�若����祉�潟�� 18.7
+○��激�ｃ�������＜����� 15.6
+▲��������㏍�ャ�� 9.5
+
+【新潟R】新潟 12R
+◎�����������激����� 31.5
+○��泣�������違�㏍����� 23.4
+▲��������������鴻�������ゃ�� 8.9
+
+【東京R】東京 1R
+◎�����若����若��B 12.0
+○��������帥�� 4.1
+▲��������帥����若�� 3.2
+
+【東京R】東京 2R
+◎�����ｃ�≪����若�� 5.6
+○��������������吾�ｃ�若����� 4.9
+▲�����若�������ｃ����若�� 2.3
+
+【東京R】東京 3R
+◎�����ｃ�������≪�若�� 17.9
+○��激�������若����若����� 9.6
+▲��激�ャ����若�������� 5.1
+
+【東京R】東京 4R
+◎�����＜����鴻�������� 3.2
+○�����≪�≪�潟�鴻�帥�� 3.2
+▲��������蚊����� 3.2
+
+【東京R】東京 5R
+◎�����吾����������若�� 3.2
+○�����＜�������宴�� 3.2
+▲�����с�������潟����� 3.2
+
+【東京R】東京 6R
+◎��帥�������ｃ�激�≪�� 9.9
+○��純�若����������鴻����若�� 7.8
+▲�����若����潟�若�� 6.9
+
+【東京R】東京 7R
+◎��祉����������������若�� 11.0
+○�����若�眼�� 6.4
+▲�����若����с�≪�����B 5.2
+
+【東京R】東京 8R
+◎��������� 9.3
+○�����鴻�帥�若����� 9.3
+▲��鴻�帥�若����若�潟����ゃ��B 6.2
+
+【東京R】東京 9R
+◎��㏍�ｃ����� 22.2
+○��吾�ャ�若�潟����㏍�激����� 20.9
+▲��泣�ゃ�若�� 14.2
+
+【東京R】東京 10R
+◎��������������㏍�若�� 10.6
+○�����＜�ゃ�≪�����B 6.0
+▲�����潟�������潟�������� 5.5
+
+【東京R】東京 11R
+◎�����若�������������� 33.0
+○�����激�ャ�眼�＜�������若��B 25.4
+▲��������ャ�≪��B 17.3
+
+【東京R】東京 12R
+◎�����若����潟�吟��������B 28.5
+○�����鴻�������若����眼�＜�� 19.9
+▲��㏍�違����若�� 15.4
+
+【京都R】京都 1R
+◎�����潟�冴����潟��B 15.4
+○��������≪�������ゃ����鴻�� 6.5
+▲�����違����鴻�㏍�� 4.0
+
+【京都R】京都 2R
+◎�����冴����������泣�潟����� 35.6
+○��≪����鴻����������� 26.0
+▲��������潟����ｃ�潟�������� 11.1
+
+【京都R】京都 3R
+◎�����������鴻����泣����潟�� 7.7
+○��������������ャ����㏍����� 7.2
+▲�����ゃ�潟����������潟�� 6.7
+
+【京都R】京都 4R
+◎��激����潟����潟�泣�� 13.3
+○��������ゃ�潟�≪����激�с�� 6.5
+▲�����若�激�ｃ�潟�違�����B 6.3
+
+【京都R】京都 5R
+◎�����潟����ャ�潟�� 3.2
+○��＜�若�������������若�� 3.2
+▲��ゃ�潟�違�������� 3.2
+
+【京都R】京都 6R
+◎��＜�＜�ゃ�潟����ｃ����� 3.3
+○��������������ｃ�若�� 3.3
+▲��������������若�� 3.3
+
+【京都R】京都 7R
+◎�����ゃ�激�潟����若����� 24.8
+○������������ 17.9
+▲��帥�������≪�������ャ�若��B 9.9
+
+【京都R】京都 8R
+◎��激�ｃ�潟����������＜�若��B 22.8
+○�����������鴻����ｃ����若�� 17.8
+▲��㏍�ゃ�������с����� 14.3
+
+【京都R】京都 9R
+◎�����≪�潟�������� 5.9
+○��潟�潟�����������������B 5.3
+▲��泣�若����ｃ�潟����� 4.0
+
+【京都R】京都 10R
+◎��������激�с����������� 25.1
+○��吾�с�若�帥��������B 12.9
+▲��������������������� 7.9
+
+【京都R】京都 11R
+◎��㏍�吟�若�潟�吾�� 19.7
+○�����ゃ�鴻�������若�≪�鴻�� 18.5
+▲��������若����潟�� 15.8
+
+【京都R】京都 12R
+◎�����ャ�㏍�� 6.1
+○��������冴����ゃ�潟�� 5.0
+▲��≪�若����潟�違����吾�����B 4.7
+
+━━━━━━━━━━━━━━
+
+
+#競馬予想 #競馬AI #ホライゾン #JRA</div>
+      <button class="copy-btn" onclick="copyToClipboard('xText', this)">📋 コピーする</button>
+      <div class="share-row">
+        <a class="share-btn" href="https://twitter.com/intent/tweet" target="_blank">𝕏で投稿</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🦋 Bluesky用投稿</h2>
+    <div class="post-box">
+      <div class="post-text" id="bskyText">🐎 2026/10/17 AI競馬予測
+📊 競馬予想AI ホライゾン
+
+
+#競馬予想 #競馬AI #ホライゾン</div>
+      <button class="copy-btn" onclick="copyToClipboard('bskyText', this)">📋 コピーする</button>
+      <div class="share-row">
+        <a class="share-btn" href="https://bsky.app/" target="_blank">Blueskyで投稿</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📝 note用記事（Markdown）</h2>
+    <div class="post-box">
+      <div class="post-text" id="noteText"># 2026/10/17 新潟・東京・京都 AI競馬予測【ホライゾン】
+
+競馬予想AI「ホライゾン」が72レース分の予測を実施しました。
+機械学習モデル（学習データ49万件・特徴量52）による分析結果です。
+
+---
+
+## 📊 全レース予測一覧
+
+| R | レース名 | ◎本命 | ○対抗 | ▲単穴 |
+|---|---------|--------|--------|--------|
+|  | 新潟 1R | �����激�с����ャ�純����ゃ��(12.0) | ��違����若�潟�≪�ゃ����潟��(7.1) | ��鴻�ゃ�若����≪�������泣��(6.6) |
+|  | 新潟 2R | ��������若�泣�潟��(16.3) | �����������鴻����㏍�若��(11.3) | �����ゃ�鴻�������ゃ�潟��(8.3) |
+|  | 新潟 3R | �����������ｃ�若��(6.4) | ��鴻�������潟�違�違�㏍�若��(6.4) | ��������潟����若����ゃ��(6.3) |
+|  | 新潟 4R | ��㏍�若����с����激��(12.7) | ��㏍�≪����＜�潟��(8.4) | ��激�≪��������(5.9) |
+|  | 新潟 5R | �����眼�с�������㏍�����(3.3) | �����ゃ�違����������潟�����(3.3) | ��������眼��(3.3) |
+|  | 新潟 6R | ��潟����ｃ�����B(10.2) | �����������ゃ�㏍�ｃ����鴻��(10.0) | �����若����潟����若�����(5.6) |
+|  | 新潟 7R | ��泣�������������激�����(25.7) | �����������障�潟����若��(25.2) | ��������潟�眼�с�鴻�����B(25.0) |
+|  | 新潟 8R | ��������若�鴻����ゃ��������(8.7) | �����潟����������＜�若��(7.7) | ��若����������ゃ��(5.6) |
+|  | 新潟 9R | ��潟�鴻�≪��������(36.8) | ������������(27.4) | �����ｃ����鴻����若��(22.6) |
+|  | 新潟 10R | ��������潟�≪�潟����㏍�若��(7.3) | �����ゃ����泣�潟�泣��(6.8) | �����冴����潟�違����潟��B(6.0) |
+|  | 新潟 11R | ��泣����������若�違�����(7.3) | �����������㏍����若��B(6.8) | ��＜�ゃ�激�с�������若��(6.6) |
+|  | 新潟 12R | ��������������������若�����(6.4) | �����帥�激�ゃ��������������(5.8) | ��������������若��(5.6) |
+|  | 新潟 1R | ��������若��������(34.3) | ��吾�ｃ�鴻����若����若��(7.9) | ��激�若����若�鴻����若��(7.3) |
+|  | 新潟 2R | ��≪�������帥��(5.8) | ��������������違�����(4.9) | �����������潟����若��(4.5) |
+|  | 新潟 3R | ��������違����若��(31.0) | ��ゃ����＜�眼����ャ��(8.4) | ��������ゃ�帥�若����ゃ��(6.3) |
+|  | 新潟 4R | ��泣����������鴻�宴�若��(8.2) | �����ゃ����若�泣�����B(6.1) | ��激�������若�����(5.7) |
+|  | 新潟 5R | �����若����若����ｃ�鴻�帥��(3.2) | ������������������(3.2) | �����ｃ�������鴻�����(3.2) |
+|  | 新潟 6R | ��泣����泣����ｃ����ｃ�����(24.8) | ��眼�若�����������������(13.6) | �����ｃ����ｃ��(12.1) |
+|  | 新潟 7R | ��������潟�吾�с�若��(5.9) | ��激�ｃ�ゃ�潟�������若�����(5.0) | ��眼�若�������������若��(4.5) |
+|  | 新潟 8R | �����с����若��B(3.9) | �����＜�ゃ����帥�潟��(3.6) | �����≪�吾�ｃ����若�����(3.5) |
+|  | 新潟 9R | ��潟�鴻�≪�������眼�＜��(18.2) | �����若����帥��������������(17.2) | �����ゃ�潟��������B(8.6) |
+|  | 新潟 10R | ��������鴻�������ｃ�若��(5.8) | �����吾�若����㏍�若��(5.6) | ��鴻�������㏍�ｃ�鴻�帥��B(5.4) |
+|  | 新潟 11R | ��������ャ�若����祉�潟��(18.7) | ��激�ｃ�������＜�����(15.6) | ��������㏍�ャ��(9.5) |
+|  | 新潟 12R | �����������激�����(31.5) | ��泣�������違�㏍�����(23.4) | ��������������鴻�������ゃ��(8.9) |
+|  | 東京 1R | ��������≪�潟��(4.0) | �����������ゃ����ｃ��(2.7) | ��≪�������潟�若��(2.5) |
+|  | 東京 2R | ��鴻����若�眼����激��������(26.3) | ��吾�若�������若�����(13.1) | �����ｃ�≪����鴻�����������(9.2) |
+|  | 東京 3R | �����������������㏍��(20.6) | �����ャ�若�㏍����＜�ゃ�帥��(16.9) | �����吾�ャ�������������潟��(10.3) |
+|  | 東京 4R | ��㏍�吾�����������(3.3) | ��������������＜�ゃ��(3.3) | ������������������(3.3) |
+|  | 東京 5R | �����若����≪����潟�吾�ｃ��(3.2) | ���������������(3.2) | �����ｃ����若��(3.2) |
+|  | 東京 6R | ��帥�ゃ�祉�ゃ�����������(6.7) | ��激�眼�ｃ�若�帥��(6.3) | ��������激�ｃ�ゃ�����(4.3) |
+|  | 東京 7R | �����≪����ゃ�冴����若�����(20.9) | ��≪�������鴻����純�若��(7.8) | ��ゃ�潟�違�≪�＜�������潟��(4.0) |
+|  | 東京 8R | �����若�鴻�������ゃ��(17.0) | �����ャ��������������(12.7) | ��≪�若����潟�≪�ゃ����潟��(8.2) |
+|  | 東京 9R | ��������������激�с�若��(30.7) | ��違����潟�������ャ�若��(26.5) | �����������若��(19.4) |
+|  | 東京 10R | ��㏍�潟�違����с�ゃ����若��(15.7) | �����ゃ��B(11.0) | ��ゃ�潟�������≪�������ゃ��B(10.6) |
+|  | 東京 11R | �����吾�������泣�潟��(8.5) | ��≪�潟��������(7.8) | �����＜�若�眼�с�潟��(7.0) |
+|  | 東京 12R | ��帥�ゃ�㏍�������������с��B(6.7) | �����潟�������吾�с��B(5.0) | ��激�с�若�������若��(4.3) |
+|  | 東京 1R | �����若����若��B(12.0) | ��������帥��(4.1) | ��������帥����若��(3.2) |
+|  | 東京 2R | �����ｃ�≪����若��(5.6) | ��������������吾�ｃ�若�����(4.9) | �����若�������ｃ����若��(2.3) |
+|  | 東京 3R | �����ｃ�������≪�若��(17.9) | ��激�������若����若�����(9.6) | ��激�ャ����若��������(5.1) |
+|  | 東京 4R | �����＜����鴻��������(3.2) | �����≪�≪�潟�鴻�帥��(3.2) | ��������蚊�����(3.2) |
+|  | 東京 5R | �����吾����������若��(3.2) | �����＜�������宴��(3.2) | �����с�������潟�����(3.2) |
+|  | 東京 6R | ��帥�������ｃ�激�≪��(9.9) | ��純�若����������鴻����若��(7.8) | �����若����潟�若��(6.9) |
+|  | 東京 7R | ��祉����������������若��(11.0) | �����若�眼��(6.4) | �����若����с�≪�����B(5.2) |
+|  | 東京 8R | ���������(9.3) | �����鴻�帥�若�����(9.3) | ��鴻�帥�若����若�潟����ゃ��B(6.2) |
+|  | 東京 9R | ��㏍�ｃ�����(22.2) | ��吾�ャ�若�潟����㏍�激�����(20.9) | ��泣�ゃ�若��(14.2) |
+|  | 東京 10R | ��������������㏍�若��(10.6) | �����＜�ゃ�≪�����B(6.0) | �����潟�������潟��������(5.5) |
+|  | 東京 11R | �����若��������������(33.0) | �����激�ャ�眼�＜�������若��B(25.4) | ��������ャ�≪��B(17.3) |
+|  | 東京 12R | �����若����潟�吟��������B(28.5) | �����鴻�������若����眼�＜��(19.9) | ��㏍�違����若��(15.4) |
+|  | 京都 1R | �����������������≪�潟�����(19.7) | ��������ャ��(9.0) | �����ゃ����������若�激�с��(4.5) |
+|  | 京都 2R | ��������ゃ����ゃ����㏍�若��(14.3) | ��潟�������若��(9.6) | ��������若�帥�若�吾�с�若��(5.5) |
+|  | 京都 3R | ��������若�������眼����若��(26.4) | ��������潟�������若��(13.8) | ��帥����������������若�����(6.0) |
+|  | 京都 4R | ��純����������ャ�若��(18.6) | ��������潟����鴻����冴��(13.7) | ��吾�ｃ�鴻����若�違����ゃ��(1.1) |
+|  | 京都 5R | �����若�㏍�������若��(3.2) | ��吾�ャ�若�潟����＜��������(3.2) | �����ｃ�純�鴻��������(3.2) |
+|  | 京都 6R | �����ゃ�����������(3.2) | ��帥����≪�������鴻��(3.2) | ������������������(3.2) |
+|  | 京都 7R | ��潟�潟�㏍��������B(11.2) | �����若����若����吟�若��(9.3) | �����ｃ�����(5.5) |
+|  | 京都 8R | ��＜�≪����若��������(6.8) | ��������潟�����(6.4) | �����ャ����������潟�ゃ��(6.3) |
+|  | 京都 9R | ��＜�ゃ�激�с����吟�潟�蚊��(6.1) | �����������ャ�純����ゃ��(6.1) | ��吾�ｃ�潟�������ャ����若��(5.3) |
+|  | 京都 10R | ��＜�ゃ�激�с��������������(35.0) | �����с����眼�＜�若��(21.2) | ���������������(14.8) |
+|  | 京都 11R | ��吾�ャ�若�潟��������(36.4) | ��潟�潟����ャ�ゃ��(22.5) | �����������鴻�����������(16.0) |
+|  | 京都 12R | ��������㏍�����(10.1) | ���������������������������(8.6) | ��泣����ャ��B(7.4) |
+|  | 京都 1R | �����潟�冴����潟��B(15.4) | ��������≪�������ゃ����鴻��(6.5) | �����違����鴻�㏍��(4.0) |
+|  | 京都 2R | �����冴����������泣�潟�����(35.6) | ��≪����鴻�����������(26.0) | ��������潟����ｃ�潟��������(11.1) |
+|  | 京都 3R | �����������鴻����泣����潟��(7.7) | ��������������ャ����㏍�����(7.2) | �����ゃ�潟����������潟��(6.7) |
+|  | 京都 4R | ��激����潟����潟�泣��(13.3) | ��������ゃ�潟�≪����激�с��(6.5) | �����若�激�ｃ�潟�違�����B(6.3) |
+|  | 京都 5R | �����潟����ャ�潟��(3.2) | ��＜�若�������������若��(3.2) | ��ゃ�潟�違��������(3.2) |
+|  | 京都 6R | ��＜�＜�ゃ�潟����ｃ�����(3.3) | ��������������ｃ�若��(3.3) | ��������������若��(3.3) |
+|  | 京都 7R | �����ゃ�激�潟����若�����(24.8) | ������������(17.9) | ��帥�������≪�������ャ�若��B(9.9) |
+|  | 京都 8R | ��激�ｃ�潟����������＜�若��B(22.8) | �����������鴻����ｃ����若��(17.8) | ��㏍�ゃ�������с�����(14.3) |
+|  | 京都 9R | �����≪�潟��������(5.9) | ��潟�潟�����������������B(5.3) | ��泣�若����ｃ�潟�����(4.0) |
+|  | 京都 10R | ��������激�с�����������(25.1) | ��吾�с�若�帥��������B(12.9) | ���������������������(7.9) |
+|  | 京都 11R | ��㏍�吟�若�潟�吾��(19.7) | �����ゃ�鴻�������若�≪�鴻��(18.5) | ��������若����潟��(15.8) |
+|  | 京都 12R | �����ャ�㏍��(6.1) | ��������冴����ゃ�潟��(5.0) | ��≪�若����潟�違����吾�����B(4.7) |
+
+---
+
+## このAIについて
+
+**ホライゾン** は競馬予想に特化したAIシステムです。
+
+- 学習データ: 2015〜2025年の49万3826件
+- 特徴量: 52種類（前走成績・馬体重・コース特性・騎手勝率など）
+- モデル: HistGradientBoostingClassifier
+- 1着的中率: 28.65% / 3着内的中率: 49.21%
+
+※ 予想は当たることを保証するものではありません。馬券購入は自己責任でお願いします。
+
+#競馬予想 #AI予想 #ホライゾン #JRA
+</div>
+      <button class="copy-btn" onclick="copyToClipboard('noteText', this)">📋 コピーする</button>
+      <div class="share-row">
+        <a class="share-btn" href="https://note.com/notes/new" target="_blank">noteで投稿</a>
+      </div>
+    </div>
+    <a class="note-link" href="https://note.com/notes/new" target="_blank">→ noteの新規記事作成画面を開く</a>
+  </div>
+
+  <div class="section">
+    <h2>📊 全レース予測一覧</h2>
+    <table>
+      <thead>
+        <tr><th>レース</th><th>◎ 本命</th><th>○ 対抗</th><th>▲ 単穴</th></tr>
+      </thead>
+      <tbody><tr><td><strong>新潟R</strong><br><span class="muted">新潟 1R </span></td><td>◎ <strong>�����激�с����ャ�純����ゃ��</strong><br><span class="muted">筝後臼 12.0</span></td><td>○ ��違����若�潟�≪�ゃ����潟��<br><span class="muted">������ 7.1</span></td><td>▲ ��鴻�ゃ�若����≪�������泣��<br><span class="muted">������ 6.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 2R </span></td><td>◎ <strong>��������若�泣�潟��</strong><br><span class="muted">������ 16.3</span></td><td>○ �����������鴻����㏍�若��<br><span class="muted">羃喝����� 11.3</span></td><td>▲ �����ゃ�鴻�������ゃ�潟��<br><span class="muted">筝劫�� 8.3</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 3R </span></td><td>◎ <strong>�����������ｃ�若��</strong><br><span class="muted">��括�� 6.4</span></td><td>○ ��鴻�������潟�違�違�㏍�若��<br><span class="muted">筝劫�� 6.4</span></td><td>▲ ��������潟����若����ゃ��<br><span class="muted">絨鎦� 6.3</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 4R </span></td><td>◎ <strong>��㏍�若����с����激��</strong><br><span class="muted">絨����臂� 12.7</span></td><td>○ ��㏍�≪����＜�潟��<br><span class="muted">������ 8.4</span></td><td>▲ ��激�≪��������<br><span class="muted">筝劫�� 5.9</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 5R </span></td><td>◎ <strong>�����眼�с�������㏍�����</strong><br><span class="muted">���筝� 3.3</span></td><td>○ �����ゃ�違����������潟�����<br><span class="muted">罍���� 3.3</span></td><td>▲ ��������眼��<br><span class="muted">��雁�医ぇ 3.3</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 6R </span></td><td>◎ <strong>��潟����ｃ�����B</strong><br><span class="muted">��ゅ��絅� 10.2</span></td><td>○ �����������ゃ�㏍�ｃ����鴻��<br><span class="muted">蕭���� 10.0</span></td><td>▲ �����若����潟����若�����<br><span class="muted">篁���� 5.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 7R </span></td><td>◎ <strong>��泣�������������激�����</strong><br><span class="muted">筝後臼 25.7</span></td><td>○ �����������障�潟����若��<br><span class="muted">絨����臂� 25.2</span></td><td>▲ ��������潟�眼�с�鴻�����B<br><span class="muted">篋���� 25.0</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 8R </span></td><td>◎ <strong>��������若�鴻����ゃ��������</strong><br><span class="muted">���羃� 8.7</span></td><td>○ �����潟����������＜�若��<br><span class="muted">��遵����� 7.7</span></td><td>▲ ��若����������ゃ��<br><span class="muted">絨鎦� 5.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 9R </span></td><td>◎ <strong>��潟�鴻�≪��������</strong><br><span class="muted">筝劫�� 36.8</span></td><td>○ ������������<br><span class="muted">篋���� 27.4</span></td><td>▲ �����ｃ����鴻����若��<br><span class="muted">���篋� 22.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 10R </span></td><td>◎ <strong>��������潟�≪�潟����㏍�若��</strong><br><span class="muted">������ 7.3</span></td><td>○ �����ゃ����泣�潟�泣��<br><span class="muted">��括�� 6.8</span></td><td>▲ �����冴����潟�違����潟��B<br><span class="muted">綏���� 6.0</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 11R </span></td><td>◎ <strong>��泣����������若�違�����</strong><br><span class="muted">������ 7.3</span></td><td>○ �����������㏍����若��B<br><span class="muted">蕭���� 6.8</span></td><td>▲ ��＜�ゃ�激�с�������若��<br><span class="muted">筝後臼 6.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 12R </span></td><td>◎ <strong>��������������������若�����</strong><br><span class="muted">������ 6.4</span></td><td>○ �����帥�激�ゃ��������������<br><span class="muted">羂後涯 5.8</span></td><td>▲ ��������������若��<br><span class="muted">��ゅ��絅� 5.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 1R </span></td><td>◎ <strong>��������若��������</strong><br><span class="muted">羃喝����� 34.3</span></td><td>○ ��吾�ｃ�鴻����若����若��<br><span class="muted">��丈�� 7.9</span></td><td>▲ ��激�若����若�鴻����若��<br><span class="muted">筝劫�� 7.3</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 2R </span></td><td>◎ <strong>��≪�������帥��</strong><br><span class="muted">篏���� 5.8</span></td><td>○ ��������������違�����<br><span class="muted">蕭���� 4.9</span></td><td>▲ �����������潟����若��<br><span class="muted">筝後臼 4.5</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 3R </span></td><td>◎ <strong>��������違����若��</strong><br><span class="muted">������ 31.0</span></td><td>○ ��ゃ����＜�眼����ャ��<br><span class="muted">絨����臂� 8.4</span></td><td>▲ ��������ゃ�帥�若����ゃ��<br><span class="muted">筝劫�� 6.3</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 4R </span></td><td>◎ <strong>��泣����������鴻�宴�若��</strong><br><span class="muted">������ 8.2</span></td><td>○ �����ゃ����若�泣�����B<br><span class="muted">腱�絮援�� 6.1</span></td><td>▲ ��激�������若�����<br><span class="muted">筝劫�� 5.7</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 5R </span></td><td>◎ <strong>�����若����若����ｃ�鴻�帥��</strong><br><span class="muted">腱�絮援�� 3.2</span></td><td>○ ������������������<br><span class="muted">羂後涯 3.2</span></td><td>▲ �����ｃ�������鴻�����<br><span class="muted">羆���亥�� 3.2</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 6R </span></td><td>◎ <strong>��泣����泣����ｃ����ｃ�����</strong><br><span class="muted">筝劫�� 24.8</span></td><td>○ ��眼�若�����������������<br><span class="muted">��括�� 13.6</span></td><td>▲ �����ｃ����ｃ��<br><span class="muted">��括����� 12.1</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 7R </span></td><td>◎ <strong>��������潟�吾�с�若��</strong><br><span class="muted">鐚㏍����� 5.9</span></td><td>○ ��激�ｃ�ゃ�潟�������若�����<br><span class="muted">絨����臂� 5.0</span></td><td>▲ ��眼�若�������������若��<br><span class="muted">��括����� 4.5</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 8R </span></td><td>◎ <strong>�����с����若��B</strong><br><span class="muted">絨閽� 3.9</span></td><td>○ �����＜�ゃ����帥�潟��<br><span class="muted">��ゅ��絅� 3.6</span></td><td>▲ �����≪�吾�ｃ����若�����<br><span class="muted">絨����臂� 3.5</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 9R </span></td><td>◎ <strong>��潟�鴻�≪�������眼�＜��</strong><br><span class="muted">��雁�医ぇ 18.2</span></td><td>○ �����若����帥��������������<br><span class="muted">������ 17.2</span></td><td>▲ �����ゃ�潟��������B<br><span class="muted">罩���� 8.6</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 10R </span></td><td>◎ <strong>��������鴻�������ｃ�若��</strong><br><span class="muted">筝後臼 5.8</span></td><td>○ �����吾�若����㏍�若��<br><span class="muted">���羃� 5.6</span></td><td>▲ ��鴻�������㏍�ｃ�鴻�帥��B<br><span class="muted">鐚㏍����� 5.4</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 11R </span></td><td>◎ <strong>��������ャ�若����祉�潟��</strong><br><span class="muted">羆�羞� 18.7</span></td><td>○ ��激�ｃ�������＜�����<br><span class="muted">筝�羌� 15.6</span></td><td>▲ ��������㏍�ャ��<br><span class="muted">������ 9.5</span></td></tr><tr><td><strong>新潟R</strong><br><span class="muted">新潟 12R </span></td><td>◎ <strong>�����������激�����</strong><br><span class="muted">羆���亥�� 31.5</span></td><td>○ ��泣�������違�㏍�����<br><span class="muted">茱水�� 23.4</span></td><td>▲ ��������������鴻�������ゃ��<br><span class="muted">��丈�� 8.9</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 1R </span></td><td>◎ <strong>��������≪�潟��</strong><br><span class="muted">絏���井�� 4.0</span></td><td>○ �����������ゃ����ｃ��<br><span class="muted">羂贋下 2.7</span></td><td>▲ ��≪�������潟�若��<br><span class="muted">��� 2.5</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 2R </span></td><td>◎ <strong>��鴻����若�眼����激��������</strong><br><span class="muted">���篋� 26.3</span></td><td>○ ��吾�若�������若�����<br><span class="muted">罔�絮掩⑥ 13.1</span></td><td>▲ �����ｃ�≪����鴻�����������<br><span class="muted">��域昇 9.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 3R </span></td><td>◎ <strong>�����������������㏍��</strong><br><span class="muted">絏���井�� 20.6</span></td><td>○ �����ャ�若�㏍����＜�ゃ�帥��<br><span class="muted">罔�絮掩⑥ 16.9</span></td><td>▲ �����吾�ャ�������������潟��<br><span class="muted">罔�絮怨�� 10.3</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 4R </span></td><td>◎ <strong>��㏍�吾�����������</strong><br><span class="muted">筝�羌� 3.3</span></td><td>○ ��������������＜�ゃ��<br><span class="muted">紊ч�� 3.3</span></td><td>▲ ������������������<br><span class="muted">������ 3.3</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 5R </span></td><td>◎ <strong>�����若����≪����潟�吾�ｃ��</strong><br><span class="muted">��� 3.2</span></td><td>○ ���������������<br><span class="muted">罩�莟� 3.2</span></td><td>▲ �����ｃ����若��<br><span class="muted">��恰����� 3.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 6R </span></td><td>◎ <strong>��帥�ゃ�祉�ゃ�����������</strong><br><span class="muted">��後����� 6.7</span></td><td>○ ��激�眼�ｃ�若�帥��<br><span class="muted">罔�絮怨�� 6.3</span></td><td>▲ ��������激�ｃ�ゃ�����<br><span class="muted">篏���� 4.3</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 7R </span></td><td>◎ <strong>�����≪����ゃ�冴����若�����</strong><br><span class="muted">��恰����� 20.9</span></td><td>○ ��≪�������鴻����純�若��<br><span class="muted">��������� 7.8</span></td><td>▲ ��ゃ�潟�違�≪�＜�������潟��<br><span class="muted">絏���井�� 4.0</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 8R </span></td><td>◎ <strong>�����若�鴻�������ゃ��</strong><br><span class="muted">���篋� 17.0</span></td><td>○ �����ャ��������������<br><span class="muted">罩�莟� 12.7</span></td><td>▲ ��≪�若����潟�≪�ゃ����潟��<br><span class="muted">羇ユ�� 8.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 9R </span></td><td>◎ <strong>��������������激�с�若��</strong><br><span class="muted">���篋� 30.7</span></td><td>○ ��違����潟�������ャ�若��<br><span class="muted">��脂��罐� 26.5</span></td><td>▲ �����������若��<br><span class="muted">絏���井�� 19.4</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 10R </span></td><td>◎ <strong>��㏍�潟�違����с�ゃ����若��</strong><br><span class="muted">��脂��罐� 15.7</span></td><td>○ �����ゃ��B<br><span class="muted">��������� 11.0</span></td><td>▲ ��ゃ�潟�������≪�������ゃ��B<br><span class="muted">���綛≦熊 10.6</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 11R </span></td><td>◎ <strong>�����吾�������泣�潟��</strong><br><span class="muted">罔�絮怨�� 8.5</span></td><td>○ ��≪�潟��������<br><span class="muted">絏���井�� 7.8</span></td><td>▲ �����＜�若�眼�с�潟��<br><span class="muted">筝�羌� 7.0</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 12R </span></td><td>◎ <strong>��帥�ゃ�㏍�������������с��B</strong><br><span class="muted">筝�羌� 6.7</span></td><td>○ �����潟�������吾�с��B<br><span class="muted">��喝�� 5.0</span></td><td>▲ ��激�с�若�������若��<br><span class="muted">罔�絮怨�� 4.3</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 1R </span></td><td>◎ <strong>�����若����若��B</strong><br><span class="muted">罔�絮掩⑥ 12.0</span></td><td>○ ��������帥��<br><span class="muted">�����医�� 4.1</span></td><td>▲ ��������帥����若��<br><span class="muted">���綛∴�� 3.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 2R </span></td><td>◎ <strong>�����ｃ�≪����若��</strong><br><span class="muted">罔�絮掩⑥ 5.6</span></td><td>○ ��������������吾�ｃ�若�����<br><span class="muted">綏���� 4.9</span></td><td>▲ �����若�������ｃ����若��<br><span class="muted">�����医�� 2.3</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 3R </span></td><td>◎ <strong>�����ｃ�������≪�若��</strong><br><span class="muted">紊ч�� 17.9</span></td><td>○ ��激�������若����若�����<br><span class="muted">罔�絮掩⑥ 9.6</span></td><td>▲ ��激�ャ����若��������<br><span class="muted">���綛≦熊 5.1</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 4R </span></td><td>◎ <strong>�����＜����鴻��������</strong><br><span class="muted">罔�絮掩⑥ 3.2</span></td><td>○ �����≪�≪�潟�鴻�帥��<br><span class="muted">紊ч�� 3.2</span></td><td>▲ ��������蚊�����<br><span class="muted">��喝�� 3.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 5R </span></td><td>◎ <strong>�����吾����������若��</strong><br><span class="muted">藪�絣狗Э 3.2</span></td><td>○ �����＜�������宴��<br><span class="muted">羇ユ�� 3.2</span></td><td>▲ �����с�������潟�����<br><span class="muted">��恰����� 3.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 6R </span></td><td>◎ <strong>��帥�������ｃ�激�≪��</strong><br><span class="muted">綏���� 9.9</span></td><td>○ ��純�若����������鴻����若��<br><span class="muted">��域昇 7.8</span></td><td>▲ �����若����潟�若��<br><span class="muted">羇ユ�� 6.9</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 7R </span></td><td>◎ <strong>��祉����������������若��</strong><br><span class="muted">紊ч�� 11.0</span></td><td>○ �����若�眼��<br><span class="muted">綏���� 6.4</span></td><td>▲ �����若����с�≪�����B<br><span class="muted">�����域�� 5.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 8R </span></td><td>◎ <strong>���������</strong><br><span class="muted">��������� 9.3</span></td><td>○ �����鴻�帥�若�����<br><span class="muted">������ 9.3</span></td><td>▲ ��鴻�帥�若����若�潟����ゃ��B<br><span class="muted">罔�絮掩⑥ 6.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 9R </span></td><td>◎ <strong>��㏍�ｃ�����</strong><br><span class="muted">������ 22.2</span></td><td>○ ��吾�ャ�若�潟����㏍�激�����<br><span class="muted">蕭���� 20.9</span></td><td>▲ ��泣�ゃ�若��<br><span class="muted">絨���у�� 14.2</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 10R </span></td><td>◎ <strong>��������������㏍�若��</strong><br><span class="muted">綏���� 10.6</span></td><td>○ �����＜�ゃ�≪�����B<br><span class="muted">��� 6.0</span></td><td>▲ �����潟�������潟��������<br><span class="muted">��上押 5.5</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 11R </span></td><td>◎ <strong>�����若��������������</strong><br><span class="muted">罔�絮掩⑥ 33.0</span></td><td>○ �����激�ャ�眼�＜�������若��B<br><span class="muted">羇ユ�� 25.4</span></td><td>▲ ��������ャ�≪��B<br><span class="muted">��桁押 17.3</span></td></tr><tr><td><strong>東京R</strong><br><span class="muted">東京 12R </span></td><td>◎ <strong>�����若����潟�吟��������B</strong><br><span class="muted">罔�絮掩⑥ 28.5</span></td><td>○ �����鴻�������若����眼�＜��<br><span class="muted">羇ユ�� 19.9</span></td><td>▲ ��㏍�違����若��<br><span class="muted">��桁押 15.4</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 1R </span></td><td>◎ <strong>�����������������≪�潟�����</strong><br><span class="muted">茱炊��羞� 19.7</span></td><td>○ ��������ャ��<br><span class="muted">��医臼 9.0</span></td><td>▲ �����ゃ����������若�激�с��<br><span class="muted">��ゆ�� 4.5</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 2R </span></td><td>◎ <strong>��������ゃ����ゃ����㏍�若��</strong><br><span class="muted">筝℡�� 14.3</span></td><td>○ ��潟�������若��<br><span class="muted">茱炊��羞� 9.6</span></td><td>▲ ��������若�帥�若�吾�с�若��<br><span class="muted">��乗�� 5.5</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 3R </span></td><td>◎ <strong>��������若�������眼����若��</strong><br><span class="muted">藪�絣狗Э 26.4</span></td><td>○ ��������潟�������若��<br><span class="muted">��医臼 13.8</span></td><td>▲ ��帥����������������若�����<br><span class="muted">��医�� 6.0</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 4R </span></td><td>◎ <strong>��純����������ャ�若��</strong><br><span class="muted">��ｆ晦 18.6</span></td><td>○ ��������潟����鴻����冴��<br><span class="muted">絨���� 13.7</span></td><td>▲ ��吾�ｃ�鴻����若�違����ゃ��<br><span class="muted">絨���у�� 1.1</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 5R </span></td><td>◎ <strong>�����若�㏍�������若��</strong><br><span class="muted">��医臼 3.2</span></td><td>○ ��吾�ャ�若�潟����＜��������<br><span class="muted">��上臼 3.2</span></td><td>▲ �����ｃ�純�鴻��������<br><span class="muted">茱水�� 3.2</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 6R </span></td><td>◎ <strong>�����ゃ�����������</strong><br><span class="muted">絲���� 3.2</span></td><td>○ ��帥����≪�������鴻��<br><span class="muted">��雁�域�� 3.2</span></td><td>▲ ������������������<br><span class="muted">鐚㏍����� 3.2</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 7R </span></td><td>◎ <strong>��潟�潟�㏍��������B</strong><br><span class="muted">羌�筝� 11.2</span></td><td>○ �����若����若����吟�若��<br><span class="muted">��上臼 9.3</span></td><td>▲ �����ｃ�����<br><span class="muted">��遵����� 5.5</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 8R </span></td><td>◎ <strong>��＜�≪����若��������</strong><br><span class="muted">紊�絎� 6.8</span></td><td>○ ��������潟�����<br><span class="muted">��乗�� 6.4</span></td><td>▲ �����ャ����������潟�ゃ��<br><span class="muted">��医臼 6.3</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 9R </span></td><td>◎ <strong>��＜�ゃ�激�с����吟�潟�蚊��</strong><br><span class="muted">��ゆ�� 6.1</span></td><td>○ �����������ャ�純����ゃ��<br><span class="muted">��上臼 6.1</span></td><td>▲ ��吾�ｃ�潟�������ャ����若��<br><span class="muted">筝℡�� 5.3</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 10R </span></td><td>◎ <strong>��＜�ゃ�激�с��������������</strong><br><span class="muted">��乗�� 35.0</span></td><td>○ �����с����眼�＜�若��<br><span class="muted">茱炊��羞� 21.2</span></td><td>▲ ���������������<br><span class="muted">藪�絣狗Э 14.8</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 11R </span></td><td>◎ <strong>��吾�ャ�若�潟��������</strong><br><span class="muted">蕭���� 36.4</span></td><td>○ ��潟�潟����ャ�ゃ��<br><span class="muted">��乗�� 22.5</span></td><td>▲ �����������鴻�����������<br><span class="muted">茱炊��羞� 16.0</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 12R </span></td><td>◎ <strong>��������㏍�����</strong><br><span class="muted">羌�筝� 10.1</span></td><td>○ ���������������������������<br><span class="muted">綏���� 8.6</span></td><td>▲ ��泣����ャ��B<br><span class="muted">茹���医�� 7.4</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 1R </span></td><td>◎ <strong>�����潟�冴����潟��B</strong><br><span class="muted">絲���� 15.4</span></td><td>○ ��������≪�������ゃ����鴻��<br><span class="muted">羈�莪� 6.5</span></td><td>▲ �����違����鴻�㏍��<br><span class="muted">羌�筝� 4.0</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 2R </span></td><td>◎ <strong>�����冴����������泣�潟�����</strong><br><span class="muted">�����＜�� 35.6</span></td><td>○ ��≪����鴻�����������<br><span class="muted">茱炊��羞� 26.0</span></td><td>▲ ��������潟����ｃ�潟��������<br><span class="muted">罔�絮怨�� 11.1</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 3R </span></td><td>◎ <strong>�����������鴻����泣����潟��</strong><br><span class="muted">�����＜�� 7.7</span></td><td>○ ��������������ャ����㏍�����<br><span class="muted">羌�筝� 7.2</span></td><td>▲ �����ゃ�潟����������潟��<br><span class="muted">������ 6.7</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 4R </span></td><td>◎ <strong>��激����潟����潟�泣��</strong><br><span class="muted">��������� 13.3</span></td><td>○ ��������ゃ�潟�≪����激�с��<br><span class="muted">��後����� 6.5</span></td><td>▲ �����若�激�ｃ�潟�違�����B<br><span class="muted">綛� 6.3</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 5R </span></td><td>◎ <strong>�����潟����ャ�潟��</strong><br><span class="muted">��後����� 3.2</span></td><td>○ ��＜�若�������������若��<br><span class="muted">��上臼 3.2</span></td><td>▲ ��ゃ�潟�違��������<br><span class="muted">���篋� 3.2</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 6R </span></td><td>◎ <strong>��＜�＜�ゃ�潟����ｃ�����</strong><br><span class="muted">紊�絎� 3.3</span></td><td>○ ��������������ｃ�若��<br><span class="muted">������ 3.3</span></td><td>▲ ��������������若��<br><span class="muted">��後����� 3.3</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 7R </span></td><td>◎ <strong>�����ゃ�激�潟����若�����</strong><br><span class="muted">��脂��罐� 24.8</span></td><td>○ ������������<br><span class="muted">�����＜�� 17.9</span></td><td>▲ ��帥�������≪�������ャ�若��B<br><span class="muted">������ 9.9</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 8R </span></td><td>◎ <strong>��激�ｃ�潟����������＜�若��B</strong><br><span class="muted">������ 22.8</span></td><td>○ �����������鴻����ｃ����若��<br><span class="muted">��医臼 17.8</span></td><td>▲ ��㏍�ゃ�������с�����<br><span class="muted">��上臼 14.3</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 9R </span></td><td>◎ <strong>�����≪�潟��������</strong><br><span class="muted">絏���井�� 5.9</span></td><td>○ ��潟�潟�����������������B<br><span class="muted">��上臼 5.3</span></td><td>▲ ��泣�若����ｃ�潟�����<br><span class="muted">�����＜�� 4.0</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 10R </span></td><td>◎ <strong>��������激�с�����������</strong><br><span class="muted">��乗�� 25.1</span></td><td>○ ��吾�с�若�帥��������B<br><span class="muted">藪�絣区�� 12.9</span></td><td>▲ ���������������������<br><span class="muted">筝℡�� 7.9</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 11R </span></td><td>◎ <strong>��㏍�吟�若�潟�吾��</strong><br><span class="muted">篁������� 19.7</span></td><td>○ �����ゃ�鴻�������若�≪�鴻��<br><span class="muted">絏���医嵯 18.5</span></td><td>▲ ��������若����潟��<br><span class="muted">鐚ｏ����� 15.8</span></td></tr><tr><td><strong>京都R</strong><br><span class="muted">京都 12R </span></td><td>◎ <strong>�����ャ�㏍��</strong><br><span class="muted">綛� 6.1</span></td><td>○ ��������冴����ゃ�潟��<br><span class="muted">�����育�� 5.0</span></td><td>▲ ��≪�若����潟�違����吾�����B<br><span class="muted">���篋� 4.7</span></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function copyToClipboard(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ コピー完了！';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 コピーする';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+</script>
+</body>
+</html>
